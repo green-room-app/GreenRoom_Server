@@ -1,0 +1,4 @@
+rootProject.name = 'greenroom-server'
+
+include 'module-common'
+include 'module-api'
