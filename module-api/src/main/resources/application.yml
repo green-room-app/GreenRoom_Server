@@ -1,0 +1,78 @@
+spring:
+  profiles:
+    active: local
+
+oauth:
+  kakao:
+    header-key: Authorization
+    header-value: Bearer
+    login-url: https://kapi.kakao.com/v2/user/me
+    logout-url: https://kapi.kakao.com/v1/user/logout
+  naver:
+    header-key: Authorization
+    header-value: Bearer
+    authorize-url: https://nid.naver.com/oauth2.0/authorize # 네이버 로그인 인증 요청
+    access-token-url: https://nid.naver.com/oauth2.0/token # 접근 토큰 발급/갱신/삭제 요청
+    login-url: https://openapi.naver.com/v1/nid/me
+
+jwt:
+  header: Authorization
+  issuer: local
+  client-secret: local
+  expiry-seconds: 7200 # 2시간
+  refresh-expiry-seconds: 86400 # 24시간
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;MODE=MYSQL;
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  sql:
+    init:
+      mode: always
+  redis:
+    host: localhost
+    port: 6379
+    password: 1111
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      ddl-auto: none
+  sql:
+    init:
+      mode: never
+
+---
+spring:
+  config:
+    activate:
+      on-profile: production
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      ddl-auto: none
+  sql:
+    init:
+      mode: never
