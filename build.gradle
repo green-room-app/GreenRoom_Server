@@ -38,8 +38,8 @@ subprojects {
 		implementation("com.google.guava:guava:31.1-jre")
 		implementation group: 'org.apache.commons', name: 'commons-lang3'
 
-
 		runtimeOnly 'com.h2database:h2'
+		runtimeOnly 'mysql:mysql-connector-java'
 		implementation 'org.springframework.security:spring-security-test'
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
