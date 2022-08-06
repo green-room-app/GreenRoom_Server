@@ -69,15 +69,13 @@ public class AuthApiController {
                                                       @Valid @RequestBody AuthDto.ReissueRequest reissueRequest) {
 
         if (!jwtProvider.verifyToken(reissueRequest.getRefreshToken())) {
-            throw new ApiException(UNAUTHORIZED,
-                String.format("Invalid refreshToken = %s", reissueRequest.getRefreshToken()));
+            throw new ApiException(UNAUTHORIZED, "Invalid refreshToken");
         }
 
         String refreshToken = refreshTokenService.getRefreshToken(authentication.getId());
 
         if (!refreshToken.equals(reissueRequest.getRefreshToken())) {
-            throw new ApiException(UNAUTHORIZED,
-                String.format("Mismatched refreshToken = %s", reissueRequest.getRefreshToken()));
+            throw new ApiException(UNAUTHORIZED, "Mismatched refreshToken");
         }
 
         String renewedApiToken = jwtProvider.createRenewedApiToken(reissueRequest.getAccessToken());

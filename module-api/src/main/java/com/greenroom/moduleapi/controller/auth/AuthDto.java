@@ -34,13 +34,13 @@ public class AuthDto {
     @AllArgsConstructor
     public static class AuthResponse {
         //jwt
-        private String apiToken;
+        private String accessToken;
 
         //refreshToken
         private String refreshToken;
 
-        public static AuthResponse of(String apiToken, String refreshToken) {
-            return new AuthResponse(apiToken, refreshToken);
+        public static AuthResponse of(String accessToken, String refreshToken) {
+            return new AuthResponse(accessToken, refreshToken);
         }
     }
 
@@ -48,13 +48,13 @@ public class AuthDto {
     @AllArgsConstructor
     public static class ReissueResponse {
         //jwt
-        private String apiToken;
+        private String accessToken;
 
         //refreshToken
         private String refreshToken;
 
-        public static ReissueResponse of(String apiToken, String refreshToken) {
-            return new ReissueResponse(apiToken, refreshToken);
+        public static ReissueResponse of(String accessToken, String refreshToken) {
+            return new ReissueResponse(accessToken, refreshToken);
         }
     }
 }
