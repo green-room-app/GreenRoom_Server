@@ -35,15 +35,21 @@ subprojects {
 		implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 		implementation 'com.auth0:java-jwt:3.19.0'
+		implementation("com.google.guava:guava:31.1-jre")
 		implementation group: 'org.apache.commons', name: 'commons-lang3'
 
 
 		runtimeOnly 'com.h2database:h2'
+		implementation 'org.springframework.security:spring-security-test'
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 		compileOnly 'org.projectlombok:lombok'
 		annotationProcessor 'org.projectlombok:lombok'
 		annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+		//테스트에서 lombok 사용. ex. @Slf4j
+		testCompileOnly 'org.projectlombok:lombok'
+		testAnnotationProcessor 'org.projectlombok:lombok'
 	}
 }
 

@@ -69,7 +69,7 @@ public class JwtProvider {
         return builder.sign(algorithm);
     }
 
-    private String createToken(Claims claims) {
+    public String createToken(Claims claims) {
         Date now = new Date();
         JWTCreator.Builder builder = com.auth0.jwt.JWT.create();
         builder.withIssuer(issuer);

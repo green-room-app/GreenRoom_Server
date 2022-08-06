@@ -5,6 +5,7 @@ import com.greenroom.moduleapi.service.user.UserService;
 import com.greenroom.modulecommon.entity.user.OAuthType;
 import com.greenroom.modulecommon.entity.user.Role;
 import com.greenroom.modulecommon.entity.user.User;
+import com.greenroom.modulecommon.exception.ApiException;
 import com.greenroom.modulecommon.jwt.JwtAuthentication;
 import com.greenroom.modulecommon.jwt.JwtAuthenticationToken;
 import com.greenroom.modulecommon.jwt.JwtProvider;
@@ -40,7 +41,6 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         return createUserAuthentication(authenticationToken.getAuthenticationId(), authenticationToken.getOAuthType());
     }
 
-    //FIXME: ApiException 주석 해제 필요
     private Authentication createUserAuthentication(String oauthId, OAuthType oAuthType) {
         try {
             User user = userService.getUserByOauthIdAndOauthType(oauthId, oAuthType);
@@ -55,8 +55,8 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
             refreshTokenService.saveRefreshToken(user.getId(), refreshToken);
 
             return authenticationToken;
-//        } catch (ApiException e) {
-//            throw new UsernameNotFoundException(e.getMessage());
+        } catch (ApiException e) {
+            throw new UsernameNotFoundException(e.getMessage());
         } catch (IllegalArgumentException e) {
             throw new BadCredentialsException(e.getMessage());
         } catch (DataAccessException e) {

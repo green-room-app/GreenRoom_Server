@@ -29,7 +29,7 @@ public class User extends AuditingCreateUpdateEntity {
     @Column(nullable = false)
     private String oauthId;
 
-    @Column(nullable = false, length = 20)
+    @Column(length = 20)
     private String name;
 
     @Column(length = 20)

@@ -18,14 +18,11 @@ public class JwtAuthentication {
 
     private final String oauthId;
 
-    private final String name;
-
     public static JwtAuthentication from(User user) {
         return JwtAuthentication.builder()
                 .id(user.getId())
                 .oauthType(user.getOauthType().getCode())
                 .oauthId(user.getOauthId())
-                .name(user.getName())
                 .build();
     }
 }
