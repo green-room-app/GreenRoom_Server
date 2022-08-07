@@ -68,6 +68,7 @@ public class UserServiceImpl implements UserService {
         checkArgument(name.length() <= 20, "name은 20자 이하여야 합니다.");
 
         User user = getUser(id);
+        checkDuplicateName(user, name);
         user.update(name);
     }
 
@@ -90,9 +91,22 @@ public class UserServiceImpl implements UserService {
         checkArgument(name.length() <= 20, "name은 20자 이하여야 합니다.");
 
         User user = getUser(id);
+        checkDuplicateName(user, name);
         Category category = categoryService.getCategory(categoryId);
 
         user.update(category, name);
+    }
+
+    private void checkDuplicateName(User user, String name) {
+        if (isUniqueName(name)) {
+            return;
+        }
+
+        if (name.equals(user.getName())) {
+            return;
+        }
+
+        throw new IllegalArgumentException("중복된 닉네임입니다.");
     }
 
     @Override
