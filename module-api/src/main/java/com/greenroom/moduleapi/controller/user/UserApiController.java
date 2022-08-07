@@ -1,5 +1,8 @@
 package com.greenroom.moduleapi.controller.user;
 
+import com.greenroom.moduleapi.controller.user.UserRequest.JoinRequest;
+import com.greenroom.moduleapi.controller.user.UserResponse.JoinResponse;
+import com.greenroom.moduleapi.controller.user.UserResponse.NameResponse;
 import com.greenroom.moduleapi.security.oauth.KakaoOAuthDto;
 import com.greenroom.moduleapi.security.oauth.KakaoOAuthService;
 import com.greenroom.moduleapi.security.oauth.NaverOAuthDto;
@@ -12,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
+import static com.greenroom.modulecommon.controller.ApiResult.OK;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @RequestMapping("/api/users")
@@ -27,7 +33,7 @@ public class UserApiController {
      * 회원가입 API
      */
     @PostMapping("/join")
-    public ApiResult<Long> join(@RequestBody UserRequest.JoinRequest request) {
+    public ApiResult<JoinResponse> join(@Valid @RequestBody JoinRequest request) {
         String accessToken = request.getAccessToken();
         OAuthType oAuthType = OAuthType.from(request.getOauthType());
 
@@ -44,7 +50,7 @@ public class UserApiController {
                 oauthId = "";
         }
 
-        return ApiResult.OK(userService.create(oauthId, oAuthType));
+        return OK(JoinResponse.from(userService.create(oauthId, oAuthType)));
     }
 
     /**
@@ -60,19 +66,23 @@ public class UserApiController {
 
         if (request.getCategoryId() == null) {
             userService.update(authentication.getId(), request.getName());
-            return ApiResult.OK();
+            return OK();
         }
 
         if (isEmpty(request.getName())) {
             userService.update(authentication.getId(), request.getCategoryId());
-            return ApiResult.OK();
+            return OK();
         }
 
         userService.update(authentication.getId(), request.getCategoryId(), request.getName());
-        return ApiResult.OK();
+        return OK();
     }
 
     /**
      * 닉네임 중복 API
      */
+    @GetMapping("/name")
+    public ApiResult<NameResponse> isValidNickname(@RequestParam("name") String name) {
+        return OK(NameResponse.from(userService.isUniqueName(name)));
+    }
 }
