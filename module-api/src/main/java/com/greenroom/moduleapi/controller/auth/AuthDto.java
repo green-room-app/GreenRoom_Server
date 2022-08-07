@@ -22,6 +22,17 @@ public class AuthDto {
     }
 
     @Getter
+    public static class LogoutRequest {
+        @NotEmpty(message = "accessToken 값은 필수입니다.")
+        private String accessToken;
+
+        @Min(value = 0)
+        @Max(value = 2)
+        @NotNull(message = "oauthType 값은 필수입니다.")
+        private Integer oauthType;
+    }
+
+    @Getter
     public static class ReissueRequest {
         @NotEmpty(message = "accessToken 값은 필수입니다.")
         private String accessToken;

@@ -52,6 +52,7 @@ public class AuthApiController {
                 oauthId = naverOAuthService.getUserInfo(NaverOAuthDto.LoginRequest.from(accessToken)).getId();
                 break;
             default:
+                //FIXME: Apple Login 로직 완성 필요
                 oauthId = "";
         }
 
@@ -62,6 +63,31 @@ public class AuthApiController {
         AuthDto.AuthResponse response = (AuthDto.AuthResponse)authenticate.getDetails();
 
         return OK(response);
+    }
+
+    @PostMapping("/logout")
+    public ApiResult<Void> logout(@AuthenticationPrincipal JwtAuthentication authentication,
+                                  @Valid @RequestBody AuthDto.LogoutRequest logoutRequest) {
+
+        String accessToken = logoutRequest.getAccessToken();
+        OAuthType oAuthType = OAuthType.from(logoutRequest.getOauthType());
+
+        switch (oAuthType) {
+            case KAKAO:
+                kakaoOAuthService.logout(KakaoOAuthDto.LogoutRequest.from(accessToken)).getId();
+                break;
+            case NAVER:
+                naverOAuthService.logout(NaverOAuthDto.LogoutRequest.from(accessToken)).getId();
+                break;
+            default:
+                //FIXME: Apple Logout 로직 완성 필요
+                break;
+        }
+
+        refreshTokenService.deleteRefreshToken(authentication.getId());
+        SecurityContextHolder.clearContext();
+
+        return OK();
     }
 
     @PostMapping("/reissue")
