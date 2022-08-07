@@ -59,12 +59,12 @@ public class UserApiController {
         }
 
         if (request.getCategoryId() == null) {
-            userService.update(authentication.getId(), request.getCategoryId());
+            userService.update(authentication.getId(), request.getName());
             return ApiResult.OK();
         }
 
         if (isEmpty(request.getName())) {
-            userService.update(authentication.getId(), request.getName());
+            userService.update(authentication.getId(), request.getCategoryId());
             return ApiResult.OK();
         }
 
