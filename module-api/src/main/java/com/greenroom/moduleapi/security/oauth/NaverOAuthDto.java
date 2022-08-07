@@ -1,6 +1,9 @@
 package com.greenroom.moduleapi.security.oauth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -53,7 +56,10 @@ public class NaverOAuthDto {
     }
 
     @Getter
+    @JsonNaming(SnakeCaseStrategy.class)
     public static class LogoutResponse {
-        private Long id;
+        private String result;
+        private String error;
+        private String errorDescription;
     }
 }

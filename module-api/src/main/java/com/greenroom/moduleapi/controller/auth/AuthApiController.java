@@ -4,6 +4,8 @@ import com.greenroom.moduleapi.security.jwt.RefreshTokenService;
 import com.greenroom.moduleapi.security.oauth.KakaoOAuthDto;
 import com.greenroom.moduleapi.security.oauth.KakaoOAuthService;
 import com.greenroom.moduleapi.security.oauth.NaverOAuthDto;
+import com.greenroom.moduleapi.security.oauth.NaverOAuthDto.LogoutRequest;
+import com.greenroom.moduleapi.security.oauth.NaverOAuthDto.LogoutResponse;
 import com.greenroom.moduleapi.security.oauth.NaverOAuthService;
 import com.greenroom.modulecommon.controller.ApiResult;
 import com.greenroom.modulecommon.entity.user.OAuthType;
@@ -23,6 +25,7 @@ import javax.validation.Valid;
 
 import static com.greenroom.modulecommon.controller.ApiResult.OK;
 import static com.greenroom.modulecommon.exception.EnumApiException.UNAUTHORIZED;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Slf4j
 @RequestMapping("/api/auth")
@@ -74,10 +77,17 @@ public class AuthApiController {
 
         switch (oAuthType) {
             case KAKAO:
-                kakaoOAuthService.logout(KakaoOAuthDto.LogoutRequest.from(accessToken)).getId();
+                String id = kakaoOAuthService.logout(KakaoOAuthDto.LogoutRequest.from(accessToken)).getId();
+                if (isEmpty(id)) {
+                    throw new IllegalArgumentException("Invalid accessToken");
+                }
                 break;
             case NAVER:
-                naverOAuthService.logout(NaverOAuthDto.LogoutRequest.from(accessToken)).getId();
+                LogoutResponse response = naverOAuthService.logout(LogoutRequest.from(accessToken));
+                if (isEmpty(response.getResult()) || !response.getResult().equals("success")) {
+                    String message = String.format("code:%s, detail:%s", response.getError(), response.getErrorDescription());
+                    throw new IllegalArgumentException(message);
+                }
                 break;
             default:
                 //FIXME: Apple Logout 로직 완성 필요

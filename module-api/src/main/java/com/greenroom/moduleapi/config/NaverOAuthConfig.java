@@ -17,4 +17,8 @@ public class NaverOAuthConfig {
     private final String loginUrl; // "https://openapi.naver.com/v1/nid/me"
 
     private final String logoutUrl; //
+
+    private final String clientId;
+
+    private final String clientSecret;
 }
