@@ -17,4 +17,10 @@ public class UserRequest {
         private Integer oauthType;
     }
 
+    @Getter
+    public static class UpdateRequest {
+        private String name;
+        private Long categoryId;
+    }
+
 }

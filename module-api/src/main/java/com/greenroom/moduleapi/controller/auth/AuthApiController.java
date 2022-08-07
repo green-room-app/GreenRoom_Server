@@ -30,8 +30,8 @@ import static com.greenroom.modulecommon.exception.EnumApiException.UNAUTHORIZED
 @RestController
 public class AuthApiController {
 
-    private final NaverOAuthService naverOAuthService;
     private final KakaoOAuthService kakaoOAuthService;
+    private final NaverOAuthService naverOAuthService;
     private final RefreshTokenService refreshTokenService;
     private final JwtProvider jwtProvider;
     private final AuthenticationManager authenticationManager;
@@ -45,11 +45,11 @@ public class AuthApiController {
         String oauthId;
 
         switch (oAuthType) {
-            case NAVER:
-                oauthId = naverOAuthService.getUserInfo(NaverOAuthDto.LoginRequest.from(accessToken)).getId();
-                break;
             case KAKAO:
                 oauthId = kakaoOAuthService.getUserInfo(KakaoOAuthDto.LoginRequest.from(accessToken)).getId();
+                break;
+            case NAVER:
+                oauthId = naverOAuthService.getUserInfo(NaverOAuthDto.LoginRequest.from(accessToken)).getId();
                 break;
             default:
                 oauthId = "";

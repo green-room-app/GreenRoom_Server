@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -35,12 +38,36 @@ public class User extends AuditingCreateUpdateEntity {
     @Column(length = 20)
     private String profileImage;
 
-    @Builder
-    private User(Long id, Category category, OAuthType oauthType, String oauthId, String name) {
-        this.id = id;
+    public void update(String name) {
+        checkArgument(isNotEmpty(name), "name 값은 필수입니다.");
+        checkArgument(name.length() <= 20, "name은 20자 이하여야 합니다.");
+
+        this.name = name;
+    }
+
+    public void update(Category category) {
+        checkArgument(category != null, "category 값은 필수입니다.");
+
         this.category = category;
+    }
+
+    public void update(Category category, String name) {
+        checkArgument(category != null, "category 값은 필수입니다.");
+        checkArgument(isNotEmpty(name), "name 값은 필수입니다.");
+        checkArgument(name.length() <= 20, "name은 20자 이하여야 합니다.");
+
+        this.category = category;
+        this.name = name;
+    }
+
+    @Builder
+    private User(Long id, OAuthType oauthType, String oauthId) {
+        checkArgument(id != null, "id 값은 필수입니다.");
+        checkArgument(oauthType != null, "oauthType 값은 필수입니다.");
+        checkArgument(isNotEmpty(oauthId), "oauthId 값은 필수입니다.");
+
+        this.id = id;
         this.oauthType = oauthType;
         this.oauthId = oauthId;
-        this.name = name;
     }
 }
