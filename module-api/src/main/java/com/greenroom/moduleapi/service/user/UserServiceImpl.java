@@ -1,5 +1,7 @@
 package com.greenroom.moduleapi.service.user;
 
+import com.greenroom.moduleapi.service.category.CategoryService;
+import com.greenroom.modulecommon.entity.category.Category;
 import com.greenroom.modulecommon.entity.user.OAuthType;
 import com.greenroom.modulecommon.entity.user.User;
 import com.greenroom.modulecommon.exception.ApiException;
@@ -18,6 +20,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final CategoryService categoryService;
 
     @Override
     @Transactional
@@ -56,6 +59,54 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ApiException(NOT_FOUND,
                         User.class,
                         String.format("oauthId = %s, oauthType = %s", oauthId, oauthType.getValue())));
+    }
+
+    @Override
+    @Transactional
+    public void update(Long id, String name) {
+        checkArgument(name != null, "name 값은 필수입니다.");
+        checkArgument(name.length() <= 20, "name은 20자 이하여야 합니다.");
+
+        User user = getUser(id);
+        checkDuplicateName(user, name);
+        user.update(name);
+    }
+
+    @Override
+    @Transactional
+    public void update(Long id, Long categoryId) {
+        checkArgument(categoryId != null, "categoryId 값은 필수입니다.");
+
+        User user = getUser(id);
+        Category category = categoryService.getCategory(categoryId);
+
+        user.update(category);
+    }
+
+    @Override
+    @Transactional
+    public void update(Long id, Long categoryId, String name) {
+        checkArgument(categoryId != null, "categoryId 값은 필수입니다.");
+        checkArgument(name != null, "name 값은 필수입니다.");
+        checkArgument(name.length() <= 20, "name은 20자 이하여야 합니다.");
+
+        User user = getUser(id);
+        checkDuplicateName(user, name);
+        Category category = categoryService.getCategory(categoryId);
+
+        user.update(category, name);
+    }
+
+    private void checkDuplicateName(User user, String name) {
+        if (isUniqueName(name)) {
+            return;
+        }
+
+        if (name.equals(user.getName())) {
+            return;
+        }
+
+        throw new IllegalArgumentException("중복된 닉네임입니다.");
     }
 
     @Override
