@@ -62,7 +62,6 @@ public class User extends AuditingCreateUpdateEntity {
 
     @Builder
     private User(Long id, OAuthType oauthType, String oauthId) {
-        checkArgument(id != null, "id 값은 필수입니다.");
         checkArgument(oauthType != null, "oauthType 값은 필수입니다.");
         checkArgument(isNotEmpty(oauthId), "oauthId 값은 필수입니다.");
 
