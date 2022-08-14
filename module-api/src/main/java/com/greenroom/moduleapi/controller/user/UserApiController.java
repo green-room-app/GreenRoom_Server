@@ -50,7 +50,7 @@ public class UserApiController {
                 oauthId = "";
         }
 
-        return OK(JoinResponse.from(userService.create(oauthId, oAuthType)));
+        return OK(JoinResponse.from(userService.create(oauthId, oAuthType, request.getCategoryId(), request.getName())));
     }
 
     /**

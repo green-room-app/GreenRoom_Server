@@ -44,16 +44,16 @@ public class JwtProvider {
                 .build();
     }
 
-    public String createApiToken(User user, String[] roles) {
+    public String createAccessToken(User user, String[] roles) {
         Claims claims = Claims.of(user, roles);
-        return createToken(claims);
+        return createTokenByClaims(claims);
     }
 
-    public String createRenewedApiToken(String apiToken) throws JWTVerificationException {
-        Claims claims = verify(apiToken);
+    public String createRenewedAccessToken(String accessToken) throws JWTVerificationException {
+        Claims claims = verify(accessToken);
         claims.eraseIat();
         claims.eraseExp();
-        return createToken(claims);
+        return createTokenByClaims(claims);
     }
 
     public String createRefreshToken() {
@@ -69,7 +69,7 @@ public class JwtProvider {
         return builder.sign(algorithm);
     }
 
-    public String createToken(Claims claims) {
+    public String createTokenByClaims(Claims claims) {
         Date now = new Date();
         JWTCreator.Builder builder = com.auth0.jwt.JWT.create();
         builder.withIssuer(issuer);

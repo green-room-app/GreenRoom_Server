@@ -32,7 +32,7 @@ public class User extends AuditingCreateUpdateEntity {
     @Column(nullable = false)
     private String oauthId;
 
-    @Column(length = 20)
+    @Column(nullable = false, length = 8)
     private String name;
 
     @Column(length = 20)
@@ -40,7 +40,7 @@ public class User extends AuditingCreateUpdateEntity {
 
     public void update(String name) {
         checkArgument(isNotEmpty(name), "name 값은 필수입니다.");
-        checkArgument(name.length() <= 20, "name은 20자 이하여야 합니다.");
+        checkArgument(name.length() <= 8, "name은 8자 이하여야 합니다.");
 
         this.name = name;
     }
@@ -54,19 +54,24 @@ public class User extends AuditingCreateUpdateEntity {
     public void update(Category category, String name) {
         checkArgument(category != null, "category 값은 필수입니다.");
         checkArgument(isNotEmpty(name), "name 값은 필수입니다.");
-        checkArgument(name.length() <= 20, "name은 20자 이하여야 합니다.");
+        checkArgument(name.length() <= 8, "name은 8자 이하여야 합니다.");
 
         this.category = category;
         this.name = name;
     }
 
     @Builder
-    private User(Long id, OAuthType oauthType, String oauthId) {
+    private User(Long id, OAuthType oauthType, String oauthId, Category category, String name) {
         checkArgument(oauthType != null, "oauthType 값은 필수입니다.");
         checkArgument(isNotEmpty(oauthId), "oauthId 값은 필수입니다.");
+        checkArgument(category != null, "category 값은 필수입니다.");
+        checkArgument(isNotEmpty(name), "name 값은 필수입니다.");
+        checkArgument(name.length() <= 8, "name은 8자 이하여야 합니다.");
 
         this.id = id;
         this.oauthType = oauthType;
         this.oauthId = oauthId;
+        this.category = category;
+        this.name = name;
     }
 }

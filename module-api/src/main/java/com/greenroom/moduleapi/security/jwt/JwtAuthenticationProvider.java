@@ -48,9 +48,16 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
             JwtAuthenticationToken authenticationToken =
                 JwtAuthenticationToken.of(jwtAuthentication, user.getOauthType(), createAuthorityList(Role.USER.value()));
 
-            String apiToken = jwtProvider.createApiToken(user, new String[]{Role.USER.value()});
+            String accessToken = jwtProvider.createAccessToken(user, new String[]{Role.USER.value()});
             String refreshToken = jwtProvider.createRefreshToken();
-            authenticationToken.setDetails(AuthDto.AuthResponse.of(apiToken, refreshToken));
+
+            AuthDto.AuthResponse authResponse = AuthDto.AuthResponse.builder()
+                                                    .accessToken(accessToken)
+                                                    .expiresIn(jwtProvider.getExpirySeconds())
+                                                    .refreshToken(refreshToken)
+                                                    .refreshTokenExpiresIn(jwtProvider.getRefreshExpirySeconds()).build();
+
+            authenticationToken.setDetails(authResponse);
 
             refreshTokenService.saveRefreshToken(user.getId(), refreshToken);
 
