@@ -4,7 +4,7 @@ import com.greenroom.modulecommon.entity.user.OAuthType;
 import com.greenroom.modulecommon.entity.user.User;
 
 public interface UserService {
-    Long create(String oauthId, OAuthType oauthType);
+    Long create(String oauthId, OAuthType oauthType, Long categoryId, String name);
 
     User getUser(Long id);
 

@@ -37,7 +37,7 @@ class JwtProviderTest {
                 new String[]{"ROLE_USER"});
 
         //when
-        String encodedJWT = jwtProvider.createToken(claims);
+        String encodedJWT = jwtProvider.createTokenByClaims(claims);
         log.info("encodedJWT: {}", encodedJWT);
 
         JwtProvider.Claims decodedJWT = jwtProvider.verify(encodedJWT);
@@ -60,14 +60,14 @@ class JwtProviderTest {
                     "oauthId",
                     new String[]{"ROLE_USER"});
 
-            String encodedJWT = jwtProvider.createToken(claims);
+            String encodedJWT = jwtProvider.createTokenByClaims(claims);
             log.info("encodedJWT: {}", encodedJWT);
 
             // 1초 대기 후 토큰 갱신
             sleep(1_000L);
 
             //when
-            String renewedEncodedJWT = jwtProvider.createRenewedApiToken(encodedJWT);
+            String renewedEncodedJWT = jwtProvider.createRenewedAccessToken(encodedJWT);
             log.info("encodedRefreshedJWT: {}", renewedEncodedJWT);
 
             assertThat(encodedJWT).isNotEqualTo(renewedEncodedJWT);

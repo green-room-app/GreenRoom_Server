@@ -114,12 +114,12 @@ public class AuthApiController {
             throw new ApiException(UNAUTHORIZED, "Mismatched refreshToken");
         }
 
-        String renewedApiToken = jwtProvider.createRenewedApiToken(reissueRequest.getAccessToken());
+        String renewedApiToken = jwtProvider.createRenewedAccessToken(reissueRequest.getAccessToken());
         String newRefreshToken = jwtProvider.createRefreshToken();
 
         refreshTokenService.saveRefreshToken(authentication.getId(), newRefreshToken);
         SecurityContextHolder.clearContext();
 
-        return OK(AuthDto.ReissueResponse.of(renewedApiToken, newRefreshToken));
+        return OK(AuthDto.ReissueResponse.of(renewedApiToken, newRefreshToken, jwtProvider.getExpirySeconds()));
     }
 }

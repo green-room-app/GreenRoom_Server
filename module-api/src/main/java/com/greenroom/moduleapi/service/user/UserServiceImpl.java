@@ -24,17 +24,27 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public Long create(String oauthId, OAuthType oauthType) {
+    public Long create(String oauthId, OAuthType oauthType, Long categoryId, String name) {
         checkArgument(oauthId != null, "oauthId 값은 필수입니다.");
         checkArgument(oauthType != null, "oauthType 값은 필수입니다.");
+        checkArgument(categoryId != null, "categoryId 값은 필수입니다.");
+        checkArgument(name != null, "name 값은 필수입니다.");
 
         if (userRepository.existsByOAuthIdAndType(oauthId, oauthType)) {
             return getUserByOauthIdAndOauthType(oauthId, oauthType).getId();
         }
 
+        Category category = categoryService.getCategory(categoryId);
+
+        if (!isUniqueName(name)) {
+            throw new IllegalArgumentException("중복된 닉네임입니다.");
+        }
+
         User user = User.builder()
                         .oauthId(oauthId)
                         .oauthType(oauthType)
+                        .category(category)
+                        .name(name)
                         .build();
 
         userRepository.save(user);

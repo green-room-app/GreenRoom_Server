@@ -1,6 +1,8 @@
 package com.greenroom.moduleapi.controller.auth;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import javax.validation.constraints.Max;
@@ -42,7 +44,7 @@ public class AuthDto {
     }
 
     @Getter
-    @AllArgsConstructor
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class AuthResponse {
         //jwt
         private String accessToken;
@@ -50,13 +52,16 @@ public class AuthDto {
         //refreshToken
         private String refreshToken;
 
-        public static AuthResponse of(String accessToken, String refreshToken) {
-            return new AuthResponse(accessToken, refreshToken);
+        //accessToken 유효 시간
+        private int expiresIn;
+
+        public static AuthResponse of(String accessToken, String refreshToken, int expiresIn) {
+            return new AuthResponse(accessToken, refreshToken, expiresIn);
         }
     }
 
     @Getter
-    @AllArgsConstructor
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class ReissueResponse {
         //jwt
         private String accessToken;
@@ -64,8 +69,11 @@ public class AuthDto {
         //refreshToken
         private String refreshToken;
 
-        public static ReissueResponse of(String accessToken, String refreshToken) {
-            return new ReissueResponse(accessToken, refreshToken);
+        //accessToken 유효 시간
+        private int expiresIn;
+
+        public static ReissueResponse of(String accessToken, String refreshToken, int expiresIn) {
+            return new ReissueResponse(accessToken, refreshToken, expiresIn);
         }
     }
 }
