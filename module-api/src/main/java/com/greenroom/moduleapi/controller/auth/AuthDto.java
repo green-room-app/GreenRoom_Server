@@ -1,7 +1,5 @@
 package com.greenroom.moduleapi.controller.auth;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -44,7 +42,7 @@ public class AuthDto {
     }
 
     @Getter
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @Builder
     public static class AuthResponse {
         //jwt
         private String accessToken;
@@ -55,13 +53,12 @@ public class AuthDto {
         //accessToken 유효 시간
         private int expiresIn;
 
-        public static AuthResponse of(String accessToken, String refreshToken, int expiresIn) {
-            return new AuthResponse(accessToken, refreshToken, expiresIn);
-        }
+        //refreshToken 유효 시간
+        private int refreshTokenExpiresIn;
     }
 
     @Getter
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @Builder
     public static class ReissueResponse {
         //jwt
         private String accessToken;
@@ -72,8 +69,7 @@ public class AuthDto {
         //accessToken 유효 시간
         private int expiresIn;
 
-        public static ReissueResponse of(String accessToken, String refreshToken, int expiresIn) {
-            return new ReissueResponse(accessToken, refreshToken, expiresIn);
-        }
+        //refreshToken 유효 시간
+        private int refreshTokenExpiresIn;
     }
 }
