@@ -20,25 +20,15 @@ import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.greenroom.modulecommon.controller.ApiResult.ERROR;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private ResponseEntity<ApiResult<?>> createResponse(Throwable throwable, HttpStatus status) {
+    private <T> ResponseEntity<ApiError<T>> createResponse(T exception, HttpStatus status) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
-        return new ResponseEntity<>(ERROR(throwable, status), headers, status);
-    }
-
-    private ResponseEntity<ApiResult<?>> createResponseByInvalidFields(String errorMessage,
-                                                                       HttpStatus status,
-                                                                       Map<String, String> invalidFields) {
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/json");
-        return new ResponseEntity<>(ERROR(errorMessage, status, invalidFields), headers, status);
+        return new ResponseEntity<>(ApiError.from(exception), headers, status);
     }
 
     /**
@@ -52,7 +42,8 @@ public class GlobalExceptionHandler {
             HttpRequestMethodNotSupportedException.class
     })
     public ResponseEntity<?> handleBadRequestException(Exception e) {
-        return createResponse(e, HttpStatus.BAD_REQUEST);
+        String message = e.getMessage();
+        return createResponse(message, HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -72,7 +63,7 @@ public class GlobalExceptionHandler {
                 .forEach(fieldError -> errorMap.put(fieldError.getField(), fieldError.getDefaultMessage()));
 
         String errorMessage = "Bad request exception occurred";
-        return createResponseByInvalidFields(errorMessage, HttpStatus.BAD_REQUEST, errorMap);
+        return createResponse(errorMessage, HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -81,7 +72,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpClientErrorException.class)
     public ResponseEntity<?> handleHttpClientErrorException(HttpClientErrorException e) {
         HttpStatus httpStatus = HttpStatus.valueOf(e.getRawStatusCode());
-        return createResponse(e, httpStatus);
+        String message = e.getMessage();
+        return createResponse(message, httpStatus);
     }
 
     /**
@@ -89,7 +81,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<?> handleApiException(ApiException e) {
-        return createResponse(e, e.getType().getStatus());
+        String message = e.getMessage();
+        return createResponse(message, e.getType().getStatus());
     }
 
     /**
@@ -98,6 +91,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({RuntimeException.class, Exception.class})
     public ResponseEntity<?> handleException(Exception e) {
         log.error("Unexpected exception occurred: {}", e.getMessage(), e);
-        return createResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
+        String clientMessage = "알 수 없는 에러가 발생했습니다. 서버 관리자에게 문의하세요.";
+        return createResponse(clientMessage, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

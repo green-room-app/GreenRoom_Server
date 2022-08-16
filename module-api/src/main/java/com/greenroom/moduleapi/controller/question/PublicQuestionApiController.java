@@ -4,7 +4,6 @@ import com.greenroom.moduleapi.controller.question.PublicQuestionDto.*;
 import com.greenroom.moduleapi.service.answer.UserQuestionAnswerService;
 import com.greenroom.moduleapi.service.question.UserQuestionService;
 import com.greenroom.moduleapi.service.scrap.ScrapService;
-import com.greenroom.modulecommon.controller.ApiResult;
 import com.greenroom.modulecommon.entity.answer.UserQuestionAnswer;
 import com.greenroom.modulecommon.entity.question.UserQuestion;
 import com.greenroom.modulecommon.entity.scrap.Scrap;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-import static com.greenroom.modulecommon.controller.ApiResult.OK;
 import static com.greenroom.modulecommon.entity.question.QuestionType.PUBLIC;
 import static java.util.stream.Collectors.toList;
 
@@ -52,7 +50,7 @@ public class PublicQuestionApiController {
      * 사용자는 '인기' 그린룸질문(지식in 타입) 목록을 조회할 수 있다
      */
     @GetMapping("/popular-questions")
-    public ApiResult<List<PopularQuestionResponse>> getPopularQuestions(Pageable pageable) {
+    public List<PopularQuestionResponse> getPopularQuestions(Pageable pageable) {
         List<UserQuestion> popularQuestions = userQuestionService.getPopularQuestions(pageable);
 
         List<PopularQuestionResponse> responses = popularQuestions
@@ -62,7 +60,7 @@ public class PublicQuestionApiController {
                 return PopularQuestionResponse.of(userQuestion, url);
         }).collect(toList());
 
-        return OK(responses);
+        return responses;
     }
 
     /**
@@ -72,9 +70,7 @@ public class PublicQuestionApiController {
      * 사용자는 '최근' 그린룸질문(지식in 타입) 목록을 조회할 수 있다
      */
     @GetMapping("/recent-questions")
-    public ApiResult<List<RecentQuestionResponse>> getRecentQuestions(PublicQuestionSearchOption searchOption,
-                                                                      Pageable pageable) {
-
+    public List<RecentQuestionResponse> getRecentQuestions(PublicQuestionSearchOption searchOption, Pageable pageable) {
         List<UserQuestion> userQuestions = userQuestionService.getUserQuestions(searchOption.getCategories(),
                                                                                 PUBLIC,
                                                                                 pageable);
@@ -86,7 +82,7 @@ public class PublicQuestionApiController {
                 return RecentQuestionResponse.of(userQuestion, url);
         }).collect(toList());
 
-        return OK(responses);
+        return responses;
     }
 
     /**
@@ -95,8 +91,8 @@ public class PublicQuestionApiController {
      * 사용자는 그린룸질문(지식in 타입)을 생성할 수 있다
      */
     @PostMapping
-    public ApiResult<CreateResponse> createPublicQuestion(@AuthenticationPrincipal JwtAuthentication authentication,
-                                                          @Valid @RequestBody CreateRequest request) {
+    public CreateResponse createPublicQuestion(@AuthenticationPrincipal JwtAuthentication authentication,
+                                               @Valid @RequestBody CreateRequest request) {
 
         Long publicQuestionId = userQuestionService.createPublicQuestion(authentication.getId(),
                                                                         request.getQuestion(),
@@ -104,7 +100,7 @@ public class PublicQuestionApiController {
                                                                         request.getExpiredAt()
         );
 
-        return OK(CreateResponse.from(publicQuestionId));
+        return CreateResponse.from(publicQuestionId);
     }
 
     //FIXME
@@ -134,11 +130,10 @@ public class PublicQuestionApiController {
      * 사용자는 그린룸질문(지식in 타입)을 스크랩할 수 있다
      */
     @PostMapping("/scrap")
-    public ApiResult<Void> scrapPublicQuestion(@AuthenticationPrincipal JwtAuthentication authentication,
-                                               @Valid @RequestBody PublicQuestionDto.ScrapRequest request) {
+    public void scrapPublicQuestion(@AuthenticationPrincipal JwtAuthentication authentication,
+                                    @Valid @RequestBody PublicQuestionDto.ScrapRequest request) {
 
         scrapService.create(authentication.getId(), request.getQuestionId());
-        return OK();
     }
 
     /**
@@ -147,8 +142,8 @@ public class PublicQuestionApiController {
      * 사용자는 자신이 스크랩한 그린룸질문(지식in 타입) 목록을 조회할 수 있다
      */
     @GetMapping("/scrap")
-    public ApiResult<List<ScrapQuestionResponse>> getScrapQuestions(@AuthenticationPrincipal JwtAuthentication authentication,
-                                                                    Pageable pageable) {
+    public List<ScrapQuestionResponse> getScrapQuestions(@AuthenticationPrincipal JwtAuthentication authentication,
+                                                         Pageable pageable) {
 
         List<Scrap> scraps = scrapService.getScraps(authentication.getId(), pageable);
 
@@ -159,7 +154,7 @@ public class PublicQuestionApiController {
                 return ScrapQuestionResponse.of(scrap, url);
         }).collect(toList());
 
-        return OK(responses);
+        return responses;
     }
 
     //FIXME
@@ -179,9 +174,8 @@ public class PublicQuestionApiController {
      * 사용자는 자신이 참여한 그린룸질문(지식in 타입) 목록을 조회할 수 있다
      */
     @GetMapping("/involve-questions")
-    public ApiResult<List<InvolveQuestionResponse>> getInvolveQuestions(
-                                                            @AuthenticationPrincipal JwtAuthentication authentication,
-                                                            Pageable pageable) {
+    public List<InvolveQuestionResponse> getInvolveQuestions(@AuthenticationPrincipal JwtAuthentication authentication,
+                                                             Pageable pageable) {
 
         List<UserQuestionAnswer> userQuestionAnswers =
                 userQuestionAnswerService.getUserQuestionAnswers(authentication.getId(), PUBLIC, pageable);
@@ -193,7 +187,7 @@ public class PublicQuestionApiController {
                 return InvolveQuestionResponse.of(answer, url);
         }).collect(toList());
 
-        return OK(responses);
+        return responses;
     }
 
     //FIXME
