@@ -15,15 +15,4 @@ public class UserResponse {
             return new JoinResponse(userId);
         }
     }
-
-    @Getter
-    @AllArgsConstructor
-    public static class NameResponse {
-
-        private boolean result;
-
-        public static NameResponse from(boolean result) {
-            return new NameResponse(result);
-        }
-    }
 }
