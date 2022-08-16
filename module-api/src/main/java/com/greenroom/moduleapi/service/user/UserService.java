@@ -16,5 +16,7 @@ public interface UserService {
 
     void update(Long id, Long categoryId, String name);
 
+    void updateProfileImage(Long id, String profileImage);
+
     boolean isUniqueName(String name);
 }

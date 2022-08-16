@@ -40,3 +40,6 @@ out/
 ### Log ###
 /log/
 /module-api/log/
+
+### PROPERTIES PROTECTION ###
+/module-api/src/main/resources/aws.properties
