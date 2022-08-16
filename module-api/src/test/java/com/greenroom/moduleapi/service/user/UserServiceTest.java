@@ -36,21 +36,21 @@ class UserServiceTest {
     @Mock
     private CategoryService categoryService;
 
-    private Category mockCategory;
-    private User mockUser;
+    private Category category;
+    private User user;
 
     @BeforeEach
     public void init() {
-        mockCategory = Category.builder()
+        category = Category.builder()
                 .id(1L)
                 .name("mockCategory")
                 .build();
 
-        mockUser = User.builder()
+        user = User.builder()
                 .id(1L)
                 .oauthType(OAuthType.KAKAO)
                 .oauthId("mockOauthId")
-                .category(mockCategory)
+                .category(category)
                 .name("mockName")
                 .build();
     }
@@ -63,14 +63,14 @@ class UserServiceTest {
         @DisplayName("oauthId, oauthType, categoryId, name이 주어지면 User를 생성할 수 있다")
         public void success1() {
             //given
-            given(userRepository.save(any())).willReturn(mockUser);
+            given(userRepository.save(any())).willReturn(user);
             given(userRepository.exists(anyString())).willReturn(false);
             given(userRepository.existsByOAuthIdAndType(anyString(), any())).willReturn(false);
-            given(categoryService.getCategory(anyLong())).willReturn(mockCategory);
+            given(categoryService.getCategory(anyLong())).willReturn(category);
 
-            String oauthId = mockUser.getOauthId();
-            OAuthType oAuthType = mockUser.getOauthType();
-            Long categoryId = mockCategory.getId();
+            String oauthId = user.getOauthId();
+            OAuthType oAuthType = user.getOauthType();
+            Long categoryId = category.getId();
             String name = "userName";
 
             //when
@@ -88,18 +88,18 @@ class UserServiceTest {
         public void success2() {
             //given
             given(userRepository.existsByOAuthIdAndType(anyString(), any())).willReturn(true);
-            given(userRepository.findByOauthIdAndOauthType(anyString(), any())).willReturn(Optional.ofNullable(mockUser));
+            given(userRepository.findByOauthIdAndOauthType(anyString(), any())).willReturn(Optional.ofNullable(user));
 
-            String existedOauthId = mockUser.getOauthId();
-            OAuthType existedOauthType = mockUser.getOauthType();
-            Long categoryId = mockCategory.getId();
+            String existedOauthId = user.getOauthId();
+            OAuthType existedOauthType = user.getOauthType();
+            Long categoryId = category.getId();
             String name = "userName";
 
             //when
             Long userId = userService.create(existedOauthId, existedOauthType, categoryId, name);
 
             //then
-            assertThat(userId).isEqualTo(mockUser.getId());
+            assertThat(userId).isEqualTo(user.getId());
             verify(userRepository, never()).save(any());
             verify(userRepository, never()).exists(anyString());
             verify(userRepository).existsByOAuthIdAndType(anyString(), any());
@@ -114,9 +114,9 @@ class UserServiceTest {
             given(userRepository.existsByOAuthIdAndType(anyString(), any())).willReturn(false);
             given(categoryService.getCategory(anyLong())).willThrow(ApiException.class);
 
-            String oauthId = mockUser.getOauthId();
-            OAuthType oAuthType = mockUser.getOauthType();
-            Long categoryId = mockCategory.getId();
+            String oauthId = user.getOauthId();
+            OAuthType oAuthType = user.getOauthType();
+            Long categoryId = category.getId();
             String name = "userName";
 
             //when
@@ -137,12 +137,12 @@ class UserServiceTest {
             //given
             given(userRepository.exists(anyString())).willReturn(true);
             given(userRepository.existsByOAuthIdAndType(anyString(), any())).willReturn(false);
-            given(categoryService.getCategory(anyLong())).willReturn(mockCategory);
+            given(categoryService.getCategory(anyLong())).willReturn(category);
 
-            String oauthId = mockUser.getOauthId();
-            OAuthType oAuthType = mockUser.getOauthType();
-            Long categoryId = mockCategory.getId();
-            String duplicatedName = "duplicatedName";
+            String oauthId = user.getOauthId();
+            OAuthType oAuthType = user.getOauthType();
+            Long categoryId = category.getId();
+            String duplicatedName = "중복닉네임";
 
             //when
             assertThatThrownBy(() -> userService.create(oauthId, oAuthType, categoryId, duplicatedName))
@@ -164,15 +164,15 @@ class UserServiceTest {
         @DisplayName("id를 입력하면 User를 반환한다")
         public void success1() {
             //given
-            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(mockUser));
+            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user));
 
             //when
-            User user = userService.getUser(mockUser.getId());
+            User user = userService.getUser(UserServiceTest.this.user.getId());
 
             //then
-            assertThat(user.getId()).isEqualTo(mockUser.getId());
-            assertThat(user.getOauthId()).isEqualTo(mockUser.getOauthId());
-            assertThat(user.getOauthType()).isEqualTo(mockUser.getOauthType());
+            assertThat(user.getId()).isEqualTo(UserServiceTest.this.user.getId());
+            assertThat(user.getOauthId()).isEqualTo(UserServiceTest.this.user.getOauthId());
+            assertThat(user.getOauthType()).isEqualTo(UserServiceTest.this.user.getOauthType());
             verify(userRepository).findById(anyLong());
         }
 
@@ -183,7 +183,7 @@ class UserServiceTest {
             given(userRepository.findById(anyLong())).willReturn(Optional.empty());
 
             //when
-            assertThatThrownBy(() -> userService.getUser(mockUser.getId())).isInstanceOf(ApiException.class);
+            assertThatThrownBy(() -> userService.getUser(user.getId())).isInstanceOf(ApiException.class);
 
             //then
             verify(userRepository).findById(anyLong());
@@ -198,15 +198,15 @@ class UserServiceTest {
         @DisplayName("oauthId와 oauthType을 입력하면 User를 반환한다")
         public void success1() {
             //given
-            given(userRepository.findByOauthIdAndOauthType(anyString(), any())).willReturn(Optional.ofNullable(mockUser));
+            given(userRepository.findByOauthIdAndOauthType(anyString(), any())).willReturn(Optional.ofNullable(user));
 
             //when
-            User user = userService.getUserByOauthIdAndOauthType(mockUser.getOauthId(), mockUser.getOauthType());
+            User user = userService.getUserByOauthIdAndOauthType(UserServiceTest.this.user.getOauthId(), UserServiceTest.this.user.getOauthType());
 
             //then
-            assertThat(user.getId()).isEqualTo(mockUser.getId());
-            assertThat(user.getOauthId()).isEqualTo(mockUser.getOauthId());
-            assertThat(user.getOauthType()).isEqualTo(mockUser.getOauthType());
+            assertThat(user.getId()).isEqualTo(UserServiceTest.this.user.getId());
+            assertThat(user.getOauthId()).isEqualTo(UserServiceTest.this.user.getOauthId());
+            assertThat(user.getOauthType()).isEqualTo(UserServiceTest.this.user.getOauthType());
             verify(userRepository).findByOauthIdAndOauthType(anyString(), any());
         }
 
@@ -217,7 +217,7 @@ class UserServiceTest {
             given(userRepository.findByOauthIdAndOauthType(anyString(), any())).willReturn(Optional.empty());
 
             //when
-            assertThatThrownBy(() -> userService.getUserByOauthIdAndOauthType(mockUser.getOauthId(), mockUser.getOauthType()))
+            assertThatThrownBy(() -> userService.getUserByOauthIdAndOauthType(user.getOauthId(), user.getOauthType()))
                     .isInstanceOf(ApiException.class);
 
             //then
@@ -233,16 +233,16 @@ class UserServiceTest {
         @DisplayName("중복되지 않은 이름이면 사용자는 이름을 업데이트할 수 있다")
         public void updateName_success1() {
             //given
-            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(mockUser));
+            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user));
             given(userRepository.exists(anyString())).willReturn(false);
 
             String newName = "newName";
 
             //when
-            userService.update(mockUser.getId(), newName);
+            userService.update(user.getId(), newName);
 
             //then
-            assertThat(mockUser.getName()).isEqualTo(newName);
+            assertThat(user.getName()).isEqualTo(newName);
             verify(userRepository).findById(anyLong());
             verify(userRepository).exists(anyString());
         }
@@ -251,16 +251,16 @@ class UserServiceTest {
         @DisplayName("중복된 이름이라도 기존의 본인 닉네임이면 이름을 업데이트할 수 있다")
         public void updateName_success2() {
             //given
-            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(mockUser));
+            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user));
             given(userRepository.exists(anyString())).willReturn(true);
 
-            String newName = mockUser.getName();
+            String newName = user.getName();
 
             //when
-            userService.update(mockUser.getId(), newName);
+            userService.update(user.getId(), newName);
 
             //then
-            assertThat(mockUser.getName()).isEqualTo(newName);
+            assertThat(user.getName()).isEqualTo(newName);
             verify(userRepository).findById(anyLong());
             verify(userRepository).exists(anyString());
         }
@@ -269,17 +269,17 @@ class UserServiceTest {
         @DisplayName("중복된 이름이면 예외를 반환한다")
         public void updateName_fail1() {
             //given
-            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(mockUser));
+            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user));
             given(userRepository.exists(anyString())).willReturn(true);
 
-            String duplicatedName = "duplicatedName";
+            String duplicatedName = "중복닉네임";
 
             //when
-            assertThatThrownBy(() -> userService.update(mockUser.getId(), duplicatedName))
+            assertThatThrownBy(() -> userService.update(user.getId(), duplicatedName))
                     .isInstanceOf(IllegalArgumentException.class);
 
             //then
-            assertThat(mockUser.getName()).isNotEqualTo(duplicatedName);
+            assertThat(user.getName()).isNotEqualTo(duplicatedName);
             verify(userRepository).findById(anyLong());
             verify(userRepository).exists(anyString());
         }
@@ -288,14 +288,14 @@ class UserServiceTest {
         @DisplayName("카테고리를 업데이트할 수 있다")
         public void updateCategoryId_success1() {
             //given
-            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(mockUser));
-            given(categoryService.getCategory(anyLong())).willReturn(mockCategory);
+            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user));
+            given(categoryService.getCategory(anyLong())).willReturn(category);
 
             //when
-            userService.update(mockUser.getId(), mockCategory.getId());
+            userService.update(user.getId(), category.getId());
 
             //then
-            assertThat(mockUser.getCategory()).isEqualTo(mockCategory);
+            assertThat(user.getCategory()).isEqualTo(category);
             verify(userRepository).findById(anyLong());
             verify(categoryService).getCategory(anyLong());
         }
@@ -304,11 +304,11 @@ class UserServiceTest {
         @DisplayName("존재하지 않는 Category로 업데이트 시 예외를 반환한다")
         public void updateCategoryId_fail1() {
             //given
-            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(mockUser));
+            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user));
             given(categoryService.getCategory(anyLong())).willThrow(ApiException.class);
 
             //when
-            assertThatThrownBy(() -> userService.update(mockUser.getId(), mockCategory.getId()))
+            assertThatThrownBy(() -> userService.update(user.getId(), category.getId()))
                     .isInstanceOf(ApiException.class);
 
             //then
@@ -320,17 +320,17 @@ class UserServiceTest {
         @DisplayName("이름과 카테고리를 업데이트 할 수 있다")
         public void updateNameAndCategoryId_success1() {
             //given
-            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(mockUser));
+            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user));
             given(userRepository.exists(anyString())).willReturn(false);
-            given(categoryService.getCategory(anyLong())).willReturn(mockCategory);
+            given(categoryService.getCategory(anyLong())).willReturn(category);
             String newName = "newName";
 
             //when
-            userService.update(mockUser.getId(), mockCategory.getId(), newName);
+            userService.update(user.getId(), category.getId(), newName);
 
             //then
-            assertThat(mockUser.getCategory()).isEqualTo(mockCategory);
-            assertThat(mockUser.getName()).isEqualTo(newName);
+            assertThat(user.getCategory()).isEqualTo(category);
+            assertThat(user.getName()).isEqualTo(newName);
             verify(userRepository).findById(anyLong());
             verify(userRepository).exists(anyString());
             verify(categoryService).getCategory(anyLong());
@@ -340,18 +340,18 @@ class UserServiceTest {
         @DisplayName("중복된 이름이라도 기존의 본인 닉네임이면 이름과 카테고리를 업데이트할 수 있다")
         public void updateNameAndCategoryId_success2() {
             //given
-            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(mockUser));
+            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user));
             given(userRepository.exists(anyString())).willReturn(true);
-            given(categoryService.getCategory(anyLong())).willReturn(mockCategory);
+            given(categoryService.getCategory(anyLong())).willReturn(category);
 
-            String newName = mockUser.getName();
+            String newName = user.getName();
 
             //when
-            userService.update(mockUser.getId(), mockCategory.getId(), newName);
+            userService.update(user.getId(), category.getId(), newName);
 
             //then
-            assertThat(mockUser.getCategory()).isEqualTo(mockCategory);
-            assertThat(mockUser.getName()).isEqualTo(newName);
+            assertThat(user.getCategory()).isEqualTo(category);
+            assertThat(user.getName()).isEqualTo(newName);
             verify(userRepository).findById(anyLong());
             verify(userRepository).exists(anyString());
             verify(categoryService).getCategory(anyLong());
@@ -361,12 +361,12 @@ class UserServiceTest {
         @DisplayName("닉네임이 중복된 경우 예외를 반환한다")
         public void updateNameAndCategoryId_fail1() {
             //given
-            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(mockUser));
+            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user));
             given(userRepository.exists(anyString())).willReturn(true);
-            String duplicatedName = "duplicatedName";
+            String duplicatedName = "중복닉네임";
 
             //when
-            assertThatThrownBy(() -> userService.update(mockUser.getId(), mockCategory.getId(), duplicatedName))
+            assertThatThrownBy(() -> userService.update(user.getId(), category.getId(), duplicatedName))
                     .isInstanceOf(IllegalArgumentException.class);
 
             //then
@@ -379,14 +379,14 @@ class UserServiceTest {
         @DisplayName("올바르지 않은 카테고리인 경우 예외를 반환한다")
         public void updateNameAndCategoryId_fail2() {
             //given
-            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(mockUser));
+            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user));
             given(categoryService.getCategory(anyLong())).willThrow(ApiException.class);
             given(userRepository.exists(anyString())).willReturn(false);
 
             String newName = "newName";
 
             //when
-            assertThatThrownBy(() -> userService.update(mockUser.getId(), mockCategory.getId(), newName))
+            assertThatThrownBy(() -> userService.update(user.getId(), category.getId(), newName))
                     .isInstanceOf(ApiException.class);
 
             //then
@@ -405,7 +405,7 @@ class UserServiceTest {
         public void success1() {
             //given
             given(userRepository.exists(anyString())).willReturn(false);
-            String uniqueName = "uniqueName";
+            String uniqueName = "유일닉네임";
 
             //when
             boolean result = userService.isUniqueName(uniqueName);
@@ -420,7 +420,7 @@ class UserServiceTest {
         public void success2() {
             //given
             given(userRepository.exists(anyString())).willReturn(true);
-            String duplicatedName = "duplicatedName";
+            String duplicatedName = "중복닉네임";
 
             //when
             boolean result = userService.isUniqueName(duplicatedName);

@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.greenroom.modulecommon.constant.EntityConstant.User.NAME_LENGTH;
+import static com.greenroom.modulecommon.constant.EntityConstant.User.PROFILE_IMAGE_LENGTH;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Getter
@@ -32,15 +34,15 @@ public class User extends AuditingCreateUpdateEntity {
     @Column(nullable = false)
     private String oauthId;
 
-    @Column(nullable = false, length = 8)
+    @Column(nullable = false, length = NAME_LENGTH)
     private String name;
 
-    @Column(length = 20)
+    @Column(length = PROFILE_IMAGE_LENGTH)
     private String profileImage;
 
     public void update(String name) {
         checkArgument(isNotEmpty(name), "name 값은 필수입니다.");
-        checkArgument(name.length() <= 8, "name은 8자 이하여야 합니다.");
+        checkArgument(name.length() <= NAME_LENGTH, String.format("name 값은 %s자 이하여야 합니다.", NAME_LENGTH));
 
         this.name = name;
     }
@@ -54,10 +56,18 @@ public class User extends AuditingCreateUpdateEntity {
     public void update(Category category, String name) {
         checkArgument(category != null, "category 값은 필수입니다.");
         checkArgument(isNotEmpty(name), "name 값은 필수입니다.");
-        checkArgument(name.length() <= 8, "name은 8자 이하여야 합니다.");
+        checkArgument(name.length() <= NAME_LENGTH, String.format("name 값은 %s자 이하여야 합니다.", NAME_LENGTH));
 
         this.category = category;
         this.name = name;
+    }
+
+    public void updateProfileImage(String profileImage) {
+        checkArgument(isNotEmpty(profileImage), "profileImage 값은 필수입니다.");
+        checkArgument(profileImage.length() <= PROFILE_IMAGE_LENGTH,
+            String.format("profileImage 값은 %s자 이하여야 합니다.", PROFILE_IMAGE_LENGTH));
+
+        this.profileImage = profileImage;
     }
 
     @Builder
@@ -66,7 +76,7 @@ public class User extends AuditingCreateUpdateEntity {
         checkArgument(isNotEmpty(oauthId), "oauthId 값은 필수입니다.");
         checkArgument(category != null, "category 값은 필수입니다.");
         checkArgument(isNotEmpty(name), "name 값은 필수입니다.");
-        checkArgument(name.length() <= 8, "name은 8자 이하여야 합니다.");
+        checkArgument(name.length() <= NAME_LENGTH, String.format("name 값은 %s자 이하여야 합니다.", NAME_LENGTH));
 
         this.id = id;
         this.oauthType = oauthType;

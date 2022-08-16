@@ -29,11 +29,11 @@ class CategoryServiceTest {
     @Mock
     private CategoryRepository categoryRepository;
 
-    private Category mockCategory;
+    private Category category;
 
     @BeforeEach
     void init() {
-        mockCategory = Category.builder()
+        category = Category.builder()
                 .id(1L)
                 .name("mockCategory")
                 .build();
@@ -47,14 +47,14 @@ class CategoryServiceTest {
         @DisplayName("categoryId로 카테고리를 조회할 수 있다")
         public void success1() {
             //given
-            given(categoryRepository.findById(anyLong())).willReturn(Optional.ofNullable(mockCategory));
+            given(categoryRepository.findById(anyLong())).willReturn(Optional.ofNullable(category));
 
             //when
-            Category category = categoryService.getCategory(mockCategory.getId());
+            Category category = categoryService.getCategory(CategoryServiceTest.this.category.getId());
 
             //then
-            assertThat(category.getId()).isEqualTo(mockCategory.getId());
-            assertThat(category.getName()).isEqualTo(mockCategory.getName());
+            assertThat(category.getId()).isEqualTo(CategoryServiceTest.this.category.getId());
+            assertThat(category.getName()).isEqualTo(CategoryServiceTest.this.category.getName());
             verify(categoryRepository).findById(anyLong());
         }
 
@@ -63,7 +63,7 @@ class CategoryServiceTest {
         public void fail1() {
             //given
             given(categoryRepository.findById(anyLong())).willReturn(Optional.empty());
-            Long invalidId = mockCategory.getId();
+            Long invalidId = category.getId();
 
             //when
             assertThatThrownBy(() -> categoryService.getCategory(invalidId))

@@ -6,11 +6,14 @@ import com.greenroom.modulecommon.entity.user.OAuthType;
 import com.greenroom.modulecommon.entity.user.User;
 import com.greenroom.modulecommon.exception.ApiException;
 import com.greenroom.modulecommon.repository.user.UserRepository;
+import com.greenroom.modulecommon.util.UploadUtils;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.greenroom.modulecommon.constant.EntityConstant.User.NAME_LENGTH;
 import static com.greenroom.modulecommon.exception.EnumApiException.NOT_FOUND;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
@@ -21,6 +24,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final CategoryService categoryService;
+    private final UploadUtils uploadUtils;
 
     @Override
     @Transactional
@@ -75,7 +79,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void update(Long id, String name) {
         checkArgument(name != null, "name 값은 필수입니다.");
-        checkArgument(name.length() <= 20, "name은 20자 이하여야 합니다.");
+        checkArgument(name.length() <= NAME_LENGTH, String.format("name 값은 %s자 이하여야 합니다.", NAME_LENGTH));
 
         User user = getUser(id);
         checkDuplicateName(user, name);
@@ -97,14 +101,36 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void update(Long id, Long categoryId, String name) {
         checkArgument(categoryId != null, "categoryId 값은 필수입니다.");
-        checkArgument(name != null, "name 값은 필수입니다.");
-        checkArgument(name.length() <= 20, "name은 20자 이하여야 합니다.");
+        checkArgument(isNotEmpty(name), "name 값은 필수입니다.");
+        checkArgument(name.length() <= NAME_LENGTH, String.format("name 값은 %s자 이하여야 합니다.", NAME_LENGTH));
 
         User user = getUser(id);
         checkDuplicateName(user, name);
         Category category = categoryService.getCategory(categoryId);
 
         user.update(category, name);
+    }
+
+    @Override
+    @Transactional
+    public void updateProfileImage(Long id, String profileImage) {
+        checkArgument(id != null, "id 값은 필수입니다.");
+        checkArgument(isNotEmpty(profileImage), "profileImage 값은 필수입니다.");
+
+        if (uploadUtils.isNotImageFile(profileImage)) {
+            throw new IllegalArgumentException("png, jpeg, jpg에 해당하는 파일만 업로드할 수 있습니다.");
+        }
+
+        String profileImageUrl = toProfileImageUrl(id, profileImage);
+        User user = getUser(id);
+
+        user.updateProfileImage(profileImageUrl);
+    }
+
+    private String toProfileImageUrl(Long id, String profileImage) {
+        String extension = FilenameUtils.getExtension(profileImage.toLowerCase());
+        String profileImageUrl = id + "/" + "profile_image" + "." + extension;
+        return profileImageUrl;
     }
 
     private void checkDuplicateName(User user, String name) {
@@ -122,7 +148,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean isUniqueName(String name) {
         checkArgument(isNotEmpty(name), "name 값은 필수입니다.");
-        checkArgument(name.length() <= 20, "name 길이는 20자 이하만 가능합니다.");
+        checkArgument(name.length() <= NAME_LENGTH, String.format("name 값은 %s자 이하여야 합니다.", NAME_LENGTH));
 
         return !userRepository.exists(name);
     }
