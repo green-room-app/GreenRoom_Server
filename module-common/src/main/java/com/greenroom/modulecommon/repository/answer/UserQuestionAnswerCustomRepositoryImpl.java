@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.greenroom.modulecommon.entity.answer.QUserQuestionAnswer.userQuestionAnswer;
-import static com.greenroom.modulecommon.entity.category.QCategory.category;
 import static com.greenroom.modulecommon.entity.question.QUserQuestion.userQuestion;
 import static com.greenroom.modulecommon.entity.user.QUser.user;
 
@@ -23,10 +22,8 @@ public class UserQuestionAnswerCustomRepositoryImpl implements UserQuestionAnswe
     public List<UserQuestionAnswer> findAllUserQuestionAnswer(Long userId, QuestionType questionType, Pageable pageable) {
         return jpaQueryFactory
                 .selectFrom(userQuestionAnswer)
-                    .join(userQuestion.user, user).fetchJoin()
+                    .join(userQuestionAnswer.user, user).fetchJoin()
                     .join(userQuestionAnswer.userQuestion, userQuestion).fetchJoin()
-                        .join(userQuestionAnswer.userQuestion.user, user).fetchJoin()
-                        .join(userQuestionAnswer.userQuestion.category, category).fetchJoin()
                 .where(userQuestionAnswer.user.id.eq(userId),
                         userQuestionAnswer.userQuestion.questionType.eq(questionType),
                         userQuestionAnswer.userQuestion.used.eq(true)
@@ -41,10 +38,8 @@ public class UserQuestionAnswerCustomRepositoryImpl implements UserQuestionAnswe
     public Optional<UserQuestionAnswer> find(Long userQuestionId, Long userId) {
         UserQuestionAnswer result = jpaQueryFactory
             .selectFrom(userQuestionAnswer)
-                .join(userQuestion.user, user).fetchJoin()
+                .join(userQuestionAnswer.user, user).fetchJoin()
                 .join(userQuestionAnswer.userQuestion, userQuestion).fetchJoin()
-                    .join(userQuestionAnswer.userQuestion.user, user).fetchJoin()
-                    .join(userQuestionAnswer.userQuestion.category, category).fetchJoin()
                 .where(
                     userQuestionAnswer.userQuestion.id.eq(userQuestionId),
                     userQuestionAnswer.userQuestion.used.eq(true),
@@ -59,10 +54,8 @@ public class UserQuestionAnswerCustomRepositoryImpl implements UserQuestionAnswe
     public Optional<UserQuestionAnswer> find(Long id) {
         UserQuestionAnswer result = jpaQueryFactory
                 .selectFrom(userQuestionAnswer)
-                    .join(userQuestion.user, user).fetchJoin()
+                    .join(userQuestionAnswer.user, user).fetchJoin()
                     .join(userQuestionAnswer.userQuestion, userQuestion).fetchJoin()
-                        .join(userQuestionAnswer.userQuestion.user, user).fetchJoin()
-                        .join(userQuestionAnswer.userQuestion.category, category).fetchJoin()
                 .where(userQuestionAnswer.id.eq(id),
                         userQuestionAnswer.userQuestion.used.eq(true)
                 )
