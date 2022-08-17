@@ -2,13 +2,16 @@ package com.greenroom.moduleapi.controller.user;
 
 import com.greenroom.moduleapi.controller.user.UserRequest.JoinRequest;
 import com.greenroom.moduleapi.controller.user.UserResponse.JoinResponse;
+import com.greenroom.moduleapi.controller.user.UserResponse.UpdateProfileImageResponse;
 import com.greenroom.moduleapi.security.oauth.KakaoOAuthDto;
 import com.greenroom.moduleapi.security.oauth.KakaoOAuthService;
 import com.greenroom.moduleapi.security.oauth.NaverOAuthDto;
 import com.greenroom.moduleapi.security.oauth.NaverOAuthService;
 import com.greenroom.moduleapi.service.user.UserService;
 import com.greenroom.modulecommon.entity.user.OAuthType;
+import com.greenroom.modulecommon.entity.user.User;
 import com.greenroom.modulecommon.jwt.JwtAuthentication;
+import com.greenroom.modulecommon.util.PresignerUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +28,7 @@ public class UserApiController {
     private final KakaoOAuthService kakaoOAuthService;
     private final NaverOAuthService naverOAuthService;
     private final UserService userService;
+    private final PresignerUtils presignerUtils;
 
     /**
      * 회원가입 API
@@ -50,6 +54,18 @@ public class UserApiController {
         return JoinResponse.from(userService.create(oauthId, oAuthType, request.getCategoryId(), request.getName()));
     }
 
+    @GetMapping
+    public UserResponse.GetResponse getUser(@AuthenticationPrincipal JwtAuthentication authentication) {
+        User user = userService.getUser(authentication.getId());
+
+        if (isEmpty(user.getProfileImage())) {
+            return UserResponse.GetResponse.from(user);
+        }
+
+        String profilePresignedUrl = presignerUtils.getPresignedGetUrl(user.getProfileImage());
+        return UserResponse.GetResponse.of(user, profilePresignedUrl);
+    }
+
     /**
      * 회원정보 수정 API
      */
@@ -72,6 +88,17 @@ public class UserApiController {
         }
 
         userService.update(authentication.getId(), request.getCategoryId(), request.getName());
+    }
+
+    @PutMapping("/profile-image")
+    public UpdateProfileImageResponse updateProfileImage(@AuthenticationPrincipal JwtAuthentication authentication,
+                                                         @Valid @RequestBody UserRequest.UpdateProfileImageRequest request) {
+
+        Long userId = userService.updateProfileImage(authentication.getId(), request.getProfileImage());
+        User user = userService.getUser(userId);
+        String profilePresignedUrl = presignerUtils.getPresignedPutUrl(user.getProfileImage());
+
+        return UpdateProfileImageResponse.from(profilePresignedUrl);
     }
 
     /**

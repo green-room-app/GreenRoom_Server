@@ -1,11 +1,13 @@
 package com.greenroom.modulecommon.repository.user;
 
 import com.greenroom.modulecommon.entity.user.OAuthType;
-import com.greenroom.modulecommon.entity.user.QUser;
 import com.greenroom.modulecommon.entity.user.User;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Optional;
+
+import static com.greenroom.modulecommon.entity.category.QCategory.category;
 import static com.greenroom.modulecommon.entity.user.QUser.user;
 
 @RequiredArgsConstructor
@@ -34,5 +36,30 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
                         .fetchFirst();
 
         return result != null;
+    }
+
+    @Override
+    public Optional<User> find(Long id) {
+        User result = jpaQueryFactory
+                .selectFrom(user)
+                .join(user.category, category).fetchJoin()
+                .where(user.id.eq(id))
+                .fetchFirst();
+
+        return Optional.ofNullable(result);
+    }
+
+    @Override
+    public Optional<User> findByOauthIdAndOauthType(String oauthId, OAuthType oAuthType) {
+        User result = jpaQueryFactory
+                .selectFrom(user)
+                .join(user.category, category).fetchJoin()
+                .where(
+                    user.oauthId.eq(oauthId),
+                    user.oauthType.eq(oAuthType)
+                )
+                .fetchFirst();
+
+        return Optional.ofNullable(result);
     }
 }

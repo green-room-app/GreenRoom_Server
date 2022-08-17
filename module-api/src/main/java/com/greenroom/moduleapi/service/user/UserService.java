@@ -10,13 +10,13 @@ public interface UserService {
 
     User getUserByOauthIdAndOauthType(String oauthId, OAuthType oauthType);
 
-    void update(Long id, String name);
+    Long update(Long id, String name);
 
-    void update(Long id, Long categoryId);
+    Long update(Long id, Long categoryId);
 
-    void update(Long id, Long categoryId, String name);
+    Long update(Long id, Long categoryId, String name);
 
-    void updateProfileImage(Long id, String profileImage);
+    Long updateProfileImage(Long id, String profileImage);
 
     boolean isUniqueName(String name);
 }

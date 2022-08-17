@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.greenroom.modulecommon.constant.EntityConstant.UserQuestionAnswer.ANSWER_LENGTH;
+import static com.greenroom.modulecommon.constant.EntityConstant.QuestionAnswer.ANSWER_LENGTH;
 import static com.greenroom.modulecommon.exception.EnumApiException.NOT_FOUND;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;

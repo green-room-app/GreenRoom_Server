@@ -62,8 +62,7 @@ public class GlobalExceptionHandler {
         e.getBindingResult().getFieldErrors()
                 .forEach(fieldError -> errorMap.put(fieldError.getField(), fieldError.getDefaultMessage()));
 
-        String errorMessage = "Bad request exception occurred";
-        return createResponse(errorMessage, HttpStatus.BAD_REQUEST);
+        return createResponse(errorMap, HttpStatus.BAD_REQUEST);
     }
 
     /**

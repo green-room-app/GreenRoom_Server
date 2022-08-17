@@ -1,7 +1,7 @@
 package com.greenroom.modulecommon.entity.answer;
 
-import com.greenroom.modulecommon.entity.AuditingCreateEntity;
-import com.greenroom.modulecommon.entity.question.UserQuestion;
+import com.greenroom.modulecommon.entity.AuditingCreateUpdateEntity;
+import com.greenroom.modulecommon.entity.question.RefQuestion;
 import com.greenroom.modulecommon.entity.user.User;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -18,16 +18,16 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "user_question_answers")
-public class UserQuestionAnswer extends AuditingCreateEntity {
+@Table(name = "ref_question_answers")
+public class RefQuestionAnswer extends AuditingCreateUpdateEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_question_id")
-    private UserQuestion userQuestion;
+    @JoinColumn(name = "ref_question_id")
+    private RefQuestion refQuestion;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -37,22 +37,15 @@ public class UserQuestionAnswer extends AuditingCreateEntity {
 
     private String keywords;
 
-    public void update(String answer) {
+    @Builder
+    private RefQuestionAnswer(Long id, RefQuestion refQuestion, User user, String answer) {
+        checkArgument(refQuestion != null, "refQuestion 값은 필수입니다.");
+        checkArgument(user != null, "user 값은 필수입니다.");
         checkArgument(isNotEmpty(answer), "answer 값은 필수입니다.");
         checkArgument(answer.length() <= ANSWER_LENGTH, String.format("answer 값은 %s자 이하여야 합니다.", ANSWER_LENGTH));
 
-        this.answer = answer;
-    }
-
-    @Builder
-    private UserQuestionAnswer(Long id, UserQuestion userQuestion, User user, String answer) {
-        checkArgument(userQuestion != null, "userQuestion 값은 필수입니다.");
-        checkArgument(user != null, "user 값은 필수입니다.");
-        checkArgument(answer != null, "answer 값은 필수입니다.");
-        checkArgument(answer.length() <= ANSWER_LENGTH, String.format("answer 값은 %s자 이하여야 합니다.", ANSWER_LENGTH));
-
         this.id = id;
-        this.userQuestion = userQuestion;
+        this.refQuestion = refQuestion;
         this.user = user;
         this.answer = answer;
         this.keywords = EMPTY;
