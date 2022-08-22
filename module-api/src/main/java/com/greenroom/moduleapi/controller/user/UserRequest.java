@@ -29,4 +29,9 @@ public class UserRequest {
         private Long categoryId;
     }
 
+    @Getter
+    public static class UpdateProfileImageRequest {
+        @NotEmpty(message = "profileImage 값은 필수입니다.")
+        private String profileImage;
+    }
 }

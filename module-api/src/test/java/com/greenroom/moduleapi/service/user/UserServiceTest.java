@@ -6,10 +6,8 @@ import com.greenroom.modulecommon.entity.user.OAuthType;
 import com.greenroom.modulecommon.entity.user.User;
 import com.greenroom.modulecommon.exception.ApiException;
 import com.greenroom.modulecommon.repository.user.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import com.greenroom.modulecommon.util.UploadUtils;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -35,6 +33,9 @@ class UserServiceTest {
 
     @Mock
     private CategoryService categoryService;
+
+    @Mock
+    private UploadUtils uploadUtils;
 
     private Category category;
     private User user;
@@ -164,7 +165,7 @@ class UserServiceTest {
         @DisplayName("id를 입력하면 User를 반환한다")
         public void success1() {
             //given
-            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user));
+            given(userRepository.find(anyLong())).willReturn(Optional.ofNullable(user));
 
             //when
             User user = userService.getUser(UserServiceTest.this.user.getId());
@@ -173,20 +174,20 @@ class UserServiceTest {
             assertThat(user.getId()).isEqualTo(UserServiceTest.this.user.getId());
             assertThat(user.getOauthId()).isEqualTo(UserServiceTest.this.user.getOauthId());
             assertThat(user.getOauthType()).isEqualTo(UserServiceTest.this.user.getOauthType());
-            verify(userRepository).findById(anyLong());
+            verify(userRepository).find(anyLong());
         }
 
         @Test
         @DisplayName("존재하지 않는 id를 입력하면 예외를 반환한다")
         public void fail1() {
             //given
-            given(userRepository.findById(anyLong())).willReturn(Optional.empty());
+            given(userRepository.find(anyLong())).willReturn(Optional.empty());
 
             //when
             assertThatThrownBy(() -> userService.getUser(user.getId())).isInstanceOf(ApiException.class);
 
             //then
-            verify(userRepository).findById(anyLong());
+            verify(userRepository).find(anyLong());
         }
     }
 
@@ -233,7 +234,7 @@ class UserServiceTest {
         @DisplayName("중복되지 않은 이름이면 사용자는 이름을 업데이트할 수 있다")
         public void updateName_success1() {
             //given
-            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user));
+            given(userRepository.find(anyLong())).willReturn(Optional.ofNullable(user));
             given(userRepository.exists(anyString())).willReturn(false);
 
             String newName = "newName";
@@ -243,7 +244,7 @@ class UserServiceTest {
 
             //then
             assertThat(user.getName()).isEqualTo(newName);
-            verify(userRepository).findById(anyLong());
+            verify(userRepository).find(anyLong());
             verify(userRepository).exists(anyString());
         }
 
@@ -251,7 +252,7 @@ class UserServiceTest {
         @DisplayName("중복된 이름이라도 기존의 본인 닉네임이면 이름을 업데이트할 수 있다")
         public void updateName_success2() {
             //given
-            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user));
+            given(userRepository.find(anyLong())).willReturn(Optional.ofNullable(user));
             given(userRepository.exists(anyString())).willReturn(true);
 
             String newName = user.getName();
@@ -261,7 +262,7 @@ class UserServiceTest {
 
             //then
             assertThat(user.getName()).isEqualTo(newName);
-            verify(userRepository).findById(anyLong());
+            verify(userRepository).find(anyLong());
             verify(userRepository).exists(anyString());
         }
 
@@ -269,7 +270,7 @@ class UserServiceTest {
         @DisplayName("중복된 이름이면 예외를 반환한다")
         public void updateName_fail1() {
             //given
-            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user));
+            given(userRepository.find(anyLong())).willReturn(Optional.ofNullable(user));
             given(userRepository.exists(anyString())).willReturn(true);
 
             String duplicatedName = "중복닉네임";
@@ -280,7 +281,7 @@ class UserServiceTest {
 
             //then
             assertThat(user.getName()).isNotEqualTo(duplicatedName);
-            verify(userRepository).findById(anyLong());
+            verify(userRepository).find(anyLong());
             verify(userRepository).exists(anyString());
         }
 
@@ -288,7 +289,7 @@ class UserServiceTest {
         @DisplayName("카테고리를 업데이트할 수 있다")
         public void updateCategoryId_success1() {
             //given
-            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user));
+            given(userRepository.find(anyLong())).willReturn(Optional.ofNullable(user));
             given(categoryService.getCategory(anyLong())).willReturn(category);
 
             //when
@@ -296,7 +297,7 @@ class UserServiceTest {
 
             //then
             assertThat(user.getCategory()).isEqualTo(category);
-            verify(userRepository).findById(anyLong());
+            verify(userRepository).find(anyLong());
             verify(categoryService).getCategory(anyLong());
         }
 
@@ -304,7 +305,7 @@ class UserServiceTest {
         @DisplayName("존재하지 않는 Category로 업데이트 시 예외를 반환한다")
         public void updateCategoryId_fail1() {
             //given
-            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user));
+            given(userRepository.find(anyLong())).willReturn(Optional.ofNullable(user));
             given(categoryService.getCategory(anyLong())).willThrow(ApiException.class);
 
             //when
@@ -312,7 +313,7 @@ class UserServiceTest {
                     .isInstanceOf(ApiException.class);
 
             //then
-            verify(userRepository).findById(anyLong());
+            verify(userRepository).find(anyLong());
             verify(categoryService).getCategory(anyLong());
         }
 
@@ -320,7 +321,7 @@ class UserServiceTest {
         @DisplayName("이름과 카테고리를 업데이트 할 수 있다")
         public void updateNameAndCategoryId_success1() {
             //given
-            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user));
+            given(userRepository.find(anyLong())).willReturn(Optional.ofNullable(user));
             given(userRepository.exists(anyString())).willReturn(false);
             given(categoryService.getCategory(anyLong())).willReturn(category);
             String newName = "newName";
@@ -331,7 +332,7 @@ class UserServiceTest {
             //then
             assertThat(user.getCategory()).isEqualTo(category);
             assertThat(user.getName()).isEqualTo(newName);
-            verify(userRepository).findById(anyLong());
+            verify(userRepository).find(anyLong());
             verify(userRepository).exists(anyString());
             verify(categoryService).getCategory(anyLong());
         }
@@ -340,7 +341,7 @@ class UserServiceTest {
         @DisplayName("중복된 이름이라도 기존의 본인 닉네임이면 이름과 카테고리를 업데이트할 수 있다")
         public void updateNameAndCategoryId_success2() {
             //given
-            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user));
+            given(userRepository.find(anyLong())).willReturn(Optional.ofNullable(user));
             given(userRepository.exists(anyString())).willReturn(true);
             given(categoryService.getCategory(anyLong())).willReturn(category);
 
@@ -352,7 +353,7 @@ class UserServiceTest {
             //then
             assertThat(user.getCategory()).isEqualTo(category);
             assertThat(user.getName()).isEqualTo(newName);
-            verify(userRepository).findById(anyLong());
+            verify(userRepository).find(anyLong());
             verify(userRepository).exists(anyString());
             verify(categoryService).getCategory(anyLong());
         }
@@ -361,7 +362,7 @@ class UserServiceTest {
         @DisplayName("닉네임이 중복된 경우 예외를 반환한다")
         public void updateNameAndCategoryId_fail1() {
             //given
-            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user));
+            given(userRepository.find(anyLong())).willReturn(Optional.ofNullable(user));
             given(userRepository.exists(anyString())).willReturn(true);
             String duplicatedName = "중복닉네임";
 
@@ -370,7 +371,7 @@ class UserServiceTest {
                     .isInstanceOf(IllegalArgumentException.class);
 
             //then
-            verify(userRepository).findById(anyLong());
+            verify(userRepository).find(anyLong());
             verify(userRepository).exists(anyString());
             verify(categoryService, never()).getCategory(anyLong());
         }
@@ -379,7 +380,7 @@ class UserServiceTest {
         @DisplayName("올바르지 않은 카테고리인 경우 예외를 반환한다")
         public void updateNameAndCategoryId_fail2() {
             //given
-            given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user));
+            given(userRepository.find(anyLong())).willReturn(Optional.ofNullable(user));
             given(categoryService.getCategory(anyLong())).willThrow(ApiException.class);
             given(userRepository.exists(anyString())).willReturn(false);
 
@@ -390,9 +391,50 @@ class UserServiceTest {
                     .isInstanceOf(ApiException.class);
 
             //then
-            verify(userRepository).findById(anyLong());
+            verify(userRepository).find(anyLong());
             verify(userRepository).exists(anyString());
             verify(categoryService).getCategory(anyLong());
+        }
+    }
+
+    @Nested
+    @DisplayName("updateProfileImage 테스트")
+    class updateProfileImage {
+
+        @Test
+        @DisplayName("프로필 이미지를 수정할 수 있다")
+        public void success1() {
+            //given
+            given(uploadUtils.isNotImageFile(anyString())).willReturn(false);
+            given(userRepository.find(anyLong())).willReturn(Optional.ofNullable(user));
+            Long userId = user.getId();
+            String profileImage = "profileImage.png";
+            assertThat(user.getProfileImage()).isNull();
+
+            //when
+            userService.updateProfileImage(userId, profileImage);
+
+            //then
+            assertThat(user.getProfileImage()).isNotEmpty();
+            verify(uploadUtils).isNotImageFile(anyString());
+            verify(userRepository).find(anyLong());
+        }
+
+        @Test
+        @DisplayName("이미지 파일 포맷이 아니면 예외를 반환한다")
+        public void fail1() {
+            //given
+            given(uploadUtils.isNotImageFile(anyString())).willReturn(true);
+            Long userId = user.getId();
+            String profileImage = "profileImage";
+
+            //when
+            assertThatThrownBy(() -> userService.updateProfileImage(userId, profileImage))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            //then
+            verify(uploadUtils).isNotImageFile(anyString());
+            verify(userRepository, never()).find(anyLong());
         }
     }
 

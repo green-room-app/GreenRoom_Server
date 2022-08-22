@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
     public User getUser(Long id) {
         checkArgument(id != null, "id 값은 필수입니다.");
 
-        return userRepository.findById(id)
+        return userRepository.find(id)
                 .orElseThrow(() -> new ApiException(NOT_FOUND, User.class, String.format("id = %s", id)));
     }
 
@@ -77,29 +77,31 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void update(Long id, String name) {
+    public Long update(Long id, String name) {
         checkArgument(name != null, "name 값은 필수입니다.");
         checkArgument(name.length() <= NAME_LENGTH, String.format("name 값은 %s자 이하여야 합니다.", NAME_LENGTH));
 
         User user = getUser(id);
         checkDuplicateName(user, name);
         user.update(name);
+        return user.getId();
     }
 
     @Override
     @Transactional
-    public void update(Long id, Long categoryId) {
+    public Long update(Long id, Long categoryId) {
         checkArgument(categoryId != null, "categoryId 값은 필수입니다.");
 
         User user = getUser(id);
         Category category = categoryService.getCategory(categoryId);
 
         user.update(category);
+        return user.getId();
     }
 
     @Override
     @Transactional
-    public void update(Long id, Long categoryId, String name) {
+    public Long update(Long id, Long categoryId, String name) {
         checkArgument(categoryId != null, "categoryId 값은 필수입니다.");
         checkArgument(isNotEmpty(name), "name 값은 필수입니다.");
         checkArgument(name.length() <= NAME_LENGTH, String.format("name 값은 %s자 이하여야 합니다.", NAME_LENGTH));
@@ -109,11 +111,12 @@ public class UserServiceImpl implements UserService {
         Category category = categoryService.getCategory(categoryId);
 
         user.update(category, name);
+        return user.getId();
     }
 
     @Override
     @Transactional
-    public void updateProfileImage(Long id, String profileImage) {
+    public Long updateProfileImage(Long id, String profileImage) {
         checkArgument(id != null, "id 값은 필수입니다.");
         checkArgument(isNotEmpty(profileImage), "profileImage 값은 필수입니다.");
 
@@ -125,6 +128,7 @@ public class UserServiceImpl implements UserService {
         User user = getUser(id);
 
         user.updateProfileImage(profileImageUrl);
+        return user.getId();
     }
 
     private String toProfileImageUrl(Long id, String profileImage) {

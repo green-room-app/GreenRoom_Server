@@ -11,7 +11,7 @@ public final class EntityConstant {
         public static final int QUESTION_LENGTH = 50;
     }
 
-    public static class UserQuestionAnswer {
+    public static class QuestionAnswer {
         public static final int ANSWER_LENGTH = 500;
     }
 

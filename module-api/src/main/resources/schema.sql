@@ -5,6 +5,8 @@ DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS user_questions CASCADE;
 DROP TABLE IF EXISTS user_question_answers CASCADE;
 DROP TABLE IF EXISTS scraps CASCADE;
+DROP TABLE IF EXISTS ref_questions CASCADE;
+DROP TABLE IF EXISTS ref_question_answers CASCADE;
 
 CREATE TABLE categories
 (
@@ -53,6 +55,7 @@ CREATE TABLE user_question_answers
 (
     id                  bigint          NOT NULL AUTO_INCREMENT COMMENT 'id',
     answer              varchar(500)    NOT NULL COMMENT '답변',
+    keywords            varchar(500)    NOT NULL COMMENT '키워드',
     created_at          timestamp       NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일시',
     user_question_id    bigint          DEFAULT NULL COMMENT '그린룸 질문 id',
     user_id             bigint          DEFAULT NULL COMMENT '답변자 id',
@@ -74,5 +77,31 @@ CREATE TABLE scraps
     CONSTRAINT fk_scraps_to_user_question FOREIGN KEY (user_question_id) REFERENCES user_questions (id) ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT fk_scraps_to_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL ON UPDATE CASCADE
 ) COMMENT '그린룸 질문 스크랩 테이블';
+
+CREATE TABLE ref_questions
+(
+    id                  bigint          NOT NULL AUTO_INCREMENT COMMENT 'id',
+    question            varchar(60)     NOT NULL COMMENT '질문',
+    created_at          timestamp       NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일시',
+    updated_at          timestamp       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일시',
+    category_id         bigint          DEFAULT NULL COMMENT '카테고리 id',
+    PRIMARY KEY (id),
+    CONSTRAINT fk_ref_questions_to_category FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE SET NULL ON UPDATE CASCADE
+) COMMENT '기본 질문 테이블';
+
+CREATE TABLE ref_question_answers
+(
+    id                  bigint          NOT NULL AUTO_INCREMENT COMMENT 'id',
+    answer              varchar(500)    NOT NULL COMMENT '답변',
+    keywords            varchar(500)    NOT NULL COMMENT '키워드',
+    created_at          timestamp       NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일시',
+    updated_at          timestamp       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일시',
+    ref_question_id     bigint          DEFAULT NULL COMMENT '기본 질문 id',
+    user_id             bigint          DEFAULT NULL COMMENT '답변자 id',
+    PRIMARY KEY (id),
+    KEY ref_question_answers_idx_ref_question_user (ref_question_id, user_id),
+    CONSTRAINT fk_ref_question_answers_to_user_question FOREIGN KEY (ref_question_id) REFERENCES ref_questions (id) ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT fk_ref_question_answers_to_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL ON UPDATE CASCADE
+) COMMENT '기본 질문 답변 테이블';
 
 SET foreign_key_checks = 1;
