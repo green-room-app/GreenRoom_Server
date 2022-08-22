@@ -429,7 +429,8 @@ class UserServiceTest {
             String profileImage = "profileImage";
 
             //when
-            Assertions.assertThrows(IllegalArgumentException.class, () -> userService.updateProfileImage(userId, profileImage));
+            assertThatThrownBy(() -> userService.updateProfileImage(userId, profileImage))
+                    .isInstanceOf(IllegalArgumentException.class);
 
             //then
             verify(uploadUtils).isNotImageFile(anyString());
