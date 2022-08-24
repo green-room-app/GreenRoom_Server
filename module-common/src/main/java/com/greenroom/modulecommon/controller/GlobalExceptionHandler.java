@@ -1,6 +1,7 @@
 package com.greenroom.modulecommon.controller;
 
 import com.greenroom.modulecommon.exception.ApiException;
+import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
@@ -33,13 +34,14 @@ public class GlobalExceptionHandler {
 
     /**
      * AuthenticationException 인증 과정중에 일어난 에러도 400으로 처리
+     * JwtException 에러도 400으로 처리
      */
     @ExceptionHandler({
             IllegalStateException.class, IllegalArgumentException.class,
             TypeMismatchException.class, HttpMessageNotReadableException.class,
             MissingServletRequestParameterException.class, MultipartException.class,
             AuthenticationException.class, DateTimeParseException.class,
-            HttpRequestMethodNotSupportedException.class
+            HttpRequestMethodNotSupportedException.class, JwtException.class
     })
     public ResponseEntity<?> handleBadRequestException(Exception e) {
         String message = e.getMessage();

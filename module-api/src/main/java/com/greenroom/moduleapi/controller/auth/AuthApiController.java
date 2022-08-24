@@ -1,12 +1,9 @@
 package com.greenroom.moduleapi.controller.auth;
 
 import com.greenroom.moduleapi.security.jwt.RefreshTokenService;
-import com.greenroom.moduleapi.security.oauth.KakaoOAuthDto;
-import com.greenroom.moduleapi.security.oauth.KakaoOAuthService;
-import com.greenroom.moduleapi.security.oauth.NaverOAuthDto;
+import com.greenroom.moduleapi.security.oauth.*;
 import com.greenroom.moduleapi.security.oauth.NaverOAuthDto.LogoutRequest;
 import com.greenroom.moduleapi.security.oauth.NaverOAuthDto.LogoutResponse;
-import com.greenroom.moduleapi.security.oauth.NaverOAuthService;
 import com.greenroom.modulecommon.entity.user.OAuthType;
 import com.greenroom.modulecommon.exception.ApiException;
 import com.greenroom.modulecommon.jwt.JwtAuthentication;
@@ -22,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-import static com.greenroom.modulecommon.exception.EnumApiException.UNAUTHORIZED;
+import static com.greenroom.modulecommon.exception.EnumApiException.FORBIDDEN;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Slf4j
@@ -33,6 +30,7 @@ public class AuthApiController {
 
     private final KakaoOAuthService kakaoOAuthService;
     private final NaverOAuthService naverOAuthService;
+    private final AppleOAuthService appleOAuthService;
     private final RefreshTokenService refreshTokenService;
     private final JwtProvider jwtProvider;
     private final AuthenticationManager authenticationManager;
@@ -52,8 +50,7 @@ public class AuthApiController {
                 oauthId = naverOAuthService.getUserInfo(NaverOAuthDto.LoginRequest.from(accessToken)).getId();
                 break;
             default:
-                //FIXME: Apple Login 로직 완성 필요
-                oauthId = "";
+                oauthId = appleOAuthService.getUserInfo(AppleOAuthDto.LoginRequest.from(accessToken)).getId();
         }
 
         JwtAuthenticationToken authToken = JwtAuthenticationToken.from(oauthId, oAuthType);
@@ -100,13 +97,13 @@ public class AuthApiController {
                                            @Valid @RequestBody AuthDto.ReissueRequest reissueRequest) {
 
         if (!jwtProvider.verifyToken(reissueRequest.getRefreshToken())) {
-            throw new ApiException(UNAUTHORIZED, "Invalid refreshToken");
+            throw new ApiException(FORBIDDEN, "Invalid refreshToken");
         }
 
         String refreshToken = refreshTokenService.getRefreshToken(authentication.getId());
 
         if (!refreshToken.equals(reissueRequest.getRefreshToken())) {
-            throw new ApiException(UNAUTHORIZED, "Mismatched refreshToken");
+            throw new ApiException(FORBIDDEN, "Mismatched refreshToken");
         }
 
         String renewedAccessToken = jwtProvider.createRenewedAccessToken(reissueRequest.getAccessToken());
