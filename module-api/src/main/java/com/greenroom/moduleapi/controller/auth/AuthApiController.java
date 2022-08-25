@@ -2,8 +2,6 @@ package com.greenroom.moduleapi.controller.auth;
 
 import com.greenroom.moduleapi.security.jwt.RefreshTokenService;
 import com.greenroom.moduleapi.security.oauth.*;
-import com.greenroom.moduleapi.security.oauth.NaverOAuthDto.LogoutRequest;
-import com.greenroom.moduleapi.security.oauth.NaverOAuthDto.LogoutResponse;
 import com.greenroom.modulecommon.entity.user.OAuthType;
 import com.greenroom.modulecommon.exception.ApiException;
 import com.greenroom.modulecommon.jwt.JwtAuthentication;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 import static com.greenroom.modulecommon.exception.EnumApiException.FORBIDDEN;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Slf4j
 @RequestMapping("/api/auth")
@@ -63,31 +60,7 @@ public class AuthApiController {
     }
 
     @PostMapping("/logout")
-    public void logout(@AuthenticationPrincipal JwtAuthentication authentication,
-                       @Valid @RequestBody AuthDto.LogoutRequest logoutRequest) {
-
-        String accessToken = logoutRequest.getAccessToken();
-        OAuthType oAuthType = OAuthType.from(logoutRequest.getOauthType());
-
-        switch (oAuthType) {
-            case KAKAO:
-                String id = kakaoOAuthService.logout(KakaoOAuthDto.LogoutRequest.from(accessToken)).getId();
-                if (isEmpty(id)) {
-                    throw new IllegalArgumentException("Invalid accessToken");
-                }
-                break;
-            case NAVER:
-                LogoutResponse response = naverOAuthService.logout(LogoutRequest.from(accessToken));
-                if (isEmpty(response.getResult()) || !response.getResult().equals("success")) {
-                    String message = String.format("code:%s, detail:%s", response.getError(), response.getErrorDescription());
-                    throw new IllegalArgumentException(message);
-                }
-                break;
-            default:
-                //FIXME: Apple Logout 로직 완성 필요
-                break;
-        }
-
+    public void logout(@AuthenticationPrincipal JwtAuthentication authentication) {
         refreshTokenService.deleteRefreshToken(authentication.getId());
         SecurityContextHolder.clearContext();
     }
