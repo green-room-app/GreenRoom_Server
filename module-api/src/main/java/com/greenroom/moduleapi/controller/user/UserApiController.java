@@ -3,10 +3,7 @@ package com.greenroom.moduleapi.controller.user;
 import com.greenroom.moduleapi.controller.user.UserRequest.JoinRequest;
 import com.greenroom.moduleapi.controller.user.UserResponse.JoinResponse;
 import com.greenroom.moduleapi.controller.user.UserResponse.UpdateProfileImageResponse;
-import com.greenroom.moduleapi.security.oauth.KakaoOAuthDto;
-import com.greenroom.moduleapi.security.oauth.KakaoOAuthService;
-import com.greenroom.moduleapi.security.oauth.NaverOAuthDto;
-import com.greenroom.moduleapi.security.oauth.NaverOAuthService;
+import com.greenroom.moduleapi.security.oauth.*;
 import com.greenroom.moduleapi.service.user.UserService;
 import com.greenroom.modulecommon.entity.user.OAuthType;
 import com.greenroom.modulecommon.entity.user.User;
@@ -27,6 +24,7 @@ public class UserApiController {
 
     private final KakaoOAuthService kakaoOAuthService;
     private final NaverOAuthService naverOAuthService;
+    private final AppleOAuthService appleOAuthService;
     private final UserService userService;
     private final PresignerUtils presignerUtils;
 
@@ -48,7 +46,7 @@ public class UserApiController {
                 oauthId = naverOAuthService.getUserInfo(NaverOAuthDto.LoginRequest.from(accessToken)).getId();
                 break;
             default:
-                oauthId = "";
+                oauthId = appleOAuthService.getUserInfo(AppleOAuthDto.LoginRequest.from(accessToken)).getId();
         }
 
         return JoinResponse.from(userService.create(oauthId, oAuthType, request.getCategoryId(), request.getName()));

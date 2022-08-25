@@ -107,7 +107,7 @@ public class PrivateQuestionApiController {
                                @Valid @RequestBody UpdateQuestionRequest request) {
 
         if (!userQuestionService.isWriter(id, authentication.getId())) {
-            throw new ApiException(EnumApiException.UNAUTHORIZED, "질문리스트 작성자만 수정할 수 있습니다");
+            throw new ApiException(EnumApiException.FORBIDDEN, "질문리스트 작성자만 수정할 수 있습니다");
         }
 
         userQuestionService.update(id, request.getQuestion(), request.getCategoryId());
@@ -124,7 +124,7 @@ public class PrivateQuestionApiController {
                                      @Valid @RequestBody UpdateAnswerRequest request) {
 
         if (!userQuestionAnswerService.isWriter(id, authentication.getId())) {
-            throw new ApiException(EnumApiException.UNAUTHORIZED, "질문리스트 답변 작성자만 수정할 수 있습니다");
+            throw new ApiException(EnumApiException.FORBIDDEN, "질문리스트 답변 작성자만 수정할 수 있습니다");
         }
 
         userQuestionAnswerService.update(id, request.getAnswer());
@@ -138,7 +138,7 @@ public class PrivateQuestionApiController {
     @DeleteMapping("/{id}")
     public void deleteQuestion(@PathVariable("id") Long id, @AuthenticationPrincipal JwtAuthentication authentication) {
         if (!userQuestionService.isWriter(id, authentication.getId())) {
-            throw new ApiException(EnumApiException.UNAUTHORIZED, "질문리스트 작성자만 수정할 수 있습니다");
+            throw new ApiException(EnumApiException.FORBIDDEN, "질문리스트 작성자만 수정할 수 있습니다");
         }
 
         userQuestionService.deletePrivateQuestion(id);

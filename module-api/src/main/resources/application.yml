@@ -26,6 +26,10 @@ oauth:
     logout-url: https://nid.naver.com/oauth2.0/token
     client-id: local
     client-secret: local
+  apple:
+    auth-key-url: https://appleid.apple.com/auth/keys # 공개키 3개 요청
+    app-bundle-id: GreenRoom.GreenRoom # aud-field
+    issuer: https://appleid.apple.com # iss-field
 
 jwt:
   header: Authorization

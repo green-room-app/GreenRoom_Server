@@ -8,7 +8,8 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum EnumApiException {
     NOT_FOUND("error.notfound", "error.notfound.details", HttpStatus.NOT_FOUND),
-    UNAUTHORIZED("error.authority","error.authority.details", HttpStatus.FORBIDDEN);
+    UNAUTHORIZED("error.authentication","error.authentication.details", HttpStatus.UNAUTHORIZED),
+    FORBIDDEN("error.authority","error.authority.details", HttpStatus.FORBIDDEN);
 
     private String messageKey;
     private String messageDetailKey;
