@@ -3,6 +3,7 @@ package com.greenroom.moduleapi.config;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import com.greenroom.moduleapi.eventlistener.SearchEventListener;
+import com.greenroom.moduleapi.service.question.search.QuestionSearchService;
 import com.greenroom.modulecommon.event.EventExceptionHandler;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +51,7 @@ public class EventConfig {
     }
 
     @Bean(destroyMethod = "close")
-    public SearchEventListener eventListener(EventBus eventBus) {
-        return new SearchEventListener(eventBus);
+    public SearchEventListener eventListener(EventBus eventBus, QuestionSearchService questionSearchService) {
+        return new SearchEventListener(eventBus, questionSearchService);
     }
 }

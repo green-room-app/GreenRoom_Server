@@ -10,13 +10,13 @@ import lombok.ToString;
 @Getter
 public class SearchEvent {
 
-    private final String keyword;
+    private final String searchWord;
 
-    public static SearchEvent from(String keyword) {
-        return new SearchEvent(keyword);
+    public static SearchEvent from(String searchWord) {
+        return new SearchEvent(searchWord);
     }
 
-    private SearchEvent(String keyword) {
-        this.keyword = keyword;
+    private SearchEvent(String searchWord) {
+        this.searchWord = searchWord;
     }
 }

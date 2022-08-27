@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,10 +45,7 @@ public class QuestionSearchService {
     @Scheduled(fixedDelay = UPDATE_SEARCH_WORD_INTERVAL)
     @Transactional
     public void updateWordsCount() {
-        log.info("updateProductViewCount call");
-
         searchWordMap.forEach((searchWord, searchCount) -> {
-            log.info("searchWord: {}, searchCount: {}", searchWord, searchCount);
             redisTemplate.opsForZSet().incrementScore(SEARCH_WORDS_KEY, searchWord, searchCount);
         });
 
@@ -57,17 +55,14 @@ public class QuestionSearchService {
     @Scheduled(fixedDelay = DECREASE_SEARCH_WORD_SCORE_INTERVAL)
     @Transactional
     public void removeAndDecreaseWordsCount() {
-        log.info("iterate call");
-
         redisTemplate.opsForZSet().removeRangeByScore(SEARCH_WORDS_KEY, -5.0, 0.0);
 
         try (Cursor<TypedTuple<String>> cursor = redisTemplate.opsForZSet().scan(SEARCH_WORDS_KEY, NONE)) {
             while (cursor.hasNext()) {
                 final TypedTuple<String> searchWord = cursor.next();
+
                 if (isEmpty(searchWord.getValue())) continue;
                 if (searchWord.getScore() == null || searchWord.getScore() < 0) continue;
-
-                log.info("word: {}, score: {}", searchWord.getValue(), searchWord.getScore());
 
                 redisTemplate.opsForZSet().incrementScore(SEARCH_WORDS_KEY, searchWord.getValue(), -1.0);
             }
@@ -78,7 +73,9 @@ public class QuestionSearchService {
 
     public List<String> getPopularSearchWords() {
         Set<TypedTuple<String>> typedTuples = redisTemplate.opsForZSet()
-            .reverseRangeWithScores(SEARCH_WORDS_KEY, 0, 4);  //score순으로 상위 5개
+            .reverseRangeWithScores(SEARCH_WORDS_KEY, 0, 4);  //스코어가 높은 순으로 상위 5개 조회
+
+        if (typedTuples == null || typedTuples.isEmpty()) return Collections.emptyList();
 
         return typedTuples.stream().map(TypedTuple::getValue).collect(toList());
     }

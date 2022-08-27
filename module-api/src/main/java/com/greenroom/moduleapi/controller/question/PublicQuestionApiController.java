@@ -3,6 +3,7 @@ package com.greenroom.moduleapi.controller.question;
 import com.greenroom.moduleapi.controller.question.PublicQuestionDto.*;
 import com.greenroom.moduleapi.service.answer.UserQuestionAnswerService;
 import com.greenroom.moduleapi.service.question.UserQuestionService;
+import com.greenroom.moduleapi.service.question.search.QuestionSearchService;
 import com.greenroom.moduleapi.service.scrap.ScrapService;
 import com.greenroom.modulecommon.entity.answer.UserQuestionAnswer;
 import com.greenroom.modulecommon.entity.question.UserQuestion;
@@ -28,6 +29,7 @@ public class PublicQuestionApiController {
     private final UserQuestionService userQuestionService;
     private final UserQuestionAnswerService userQuestionAnswerService;
     private final ScrapService scrapService;
+    private final QuestionSearchService questionSearchService;
     private final PresignerUtils presignerUtils;
 
     //FIXME
@@ -42,6 +44,14 @@ public class PublicQuestionApiController {
     @GetMapping
     public void getPublicQuestions(Pageable pageable) {
 
+    }
+
+    /**
+     * 인기 검색어 목록을 조회할 수 있다
+     */
+    @GetMapping("/popular-search-words")
+    public List<String> getPopularSearchWords() {
+        return questionSearchService.getPopularSearchWords();
     }
 
     /**
