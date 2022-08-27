@@ -258,7 +258,7 @@ class UserQuestionServiceTest {
         public void success1() {
             //given
             given(userQuestionRepository.find(anyLong())).willReturn(Optional.of(privateUserQuestion));
-            User writer = privateUserQuestion.getUser();
+            User writer = privateUserQuestion.getUser().get();
 
             //when
             boolean result = userQuestionService.isWriter(privateUserQuestion.getId(), writer.getId());

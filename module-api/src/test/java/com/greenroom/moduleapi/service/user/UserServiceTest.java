@@ -155,6 +155,32 @@ class UserServiceTest {
             verify(userRepository).existsByOAuthIdAndType(anyString(), any());
             verify(categoryService).getCategory(anyLong());
         }
+
+        @Test
+        @DisplayName("탈퇴한 회원의 경우 회원 가입에 실패한다")
+        public void fail3() {
+            //given
+            given(userRepository.existsByOAuthIdAndType(anyString(), any())).willReturn(true);
+            given(userRepository.findByOauthIdAndOauthType(anyString(), any())).willReturn(Optional.ofNullable(user));
+
+            String oauthId = user.getOauthId();
+            OAuthType oAuthType = user.getOauthType();
+            Long categoryId = category.getId();
+            String name = "userName";
+
+            //when
+            user.delete();
+
+            assertThatThrownBy(() -> userService.create(oauthId, oAuthType, categoryId, name))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            //then
+            verify(userRepository, never()).save(any());
+            verify(userRepository, never()).exists(anyString());
+            verify(userRepository).existsByOAuthIdAndType(anyString(), any());
+            verify(userRepository).findByOauthIdAndOauthType(anyString(), any());
+            verify(categoryService, never()).getCategory(anyLong());
+        }
     }
 
     @Nested
@@ -435,6 +461,32 @@ class UserServiceTest {
             //then
             verify(uploadUtils).isNotImageFile(anyString());
             verify(userRepository, never()).find(anyLong());
+        }
+    }
+
+    @Nested
+    @DisplayName("delete 테스트")
+    class delete {
+
+        @Test
+        @DisplayName("회원 탈퇴를 할 수 있다")
+        public void success1() {
+            //given
+            given(userRepository.find(anyLong())).willReturn(Optional.ofNullable(user));
+
+            Long deleteUserId = user.getId();
+            assertThat(user.isUsed()).isTrue();
+            assertThat(user.getWithdrawalDate()).isNull();
+
+
+            //when
+            userService.delete(deleteUserId);
+
+            assertThat(user.isUsed()).isFalse();
+            assertThat(user.getWithdrawalDate()).isNotNull();
+
+            //then
+            verify(userRepository).find(anyLong());
         }
     }
 

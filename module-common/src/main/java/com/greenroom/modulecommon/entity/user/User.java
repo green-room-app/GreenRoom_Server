@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import java.time.LocalDate;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.greenroom.modulecommon.constant.EntityConstant.User.NAME_LENGTH;
 import static com.greenroom.modulecommon.constant.EntityConstant.User.PROFILE_IMAGE_LENGTH;
@@ -40,6 +42,10 @@ public class User extends AuditingCreateUpdateEntity {
     @Column(length = PROFILE_IMAGE_LENGTH)
     private String profileImage;
 
+    private boolean used;
+
+    private LocalDate withdrawalDate;
+
     public void update(String name) {
         checkArgument(isNotEmpty(name), "name 값은 필수입니다.");
         checkArgument(name.length() <= NAME_LENGTH, String.format("name 값은 %s자 이하여야 합니다.", NAME_LENGTH));
@@ -70,6 +76,15 @@ public class User extends AuditingCreateUpdateEntity {
         this.profileImage = profileImage;
     }
 
+    public void delete() {
+        this.used = false;
+        this.withdrawalDate = LocalDate.now();
+    }
+
+    public boolean isNotUsed() {
+        return !this.used;
+    }
+
     @Builder
     private User(Long id, OAuthType oauthType, String oauthId, Category category, String name) {
         checkArgument(oauthType != null, "oauthType 값은 필수입니다.");
@@ -83,5 +98,6 @@ public class User extends AuditingCreateUpdateEntity {
         this.oauthId = oauthId;
         this.category = category;
         this.name = name;
+        this.used = true;
     }
 }

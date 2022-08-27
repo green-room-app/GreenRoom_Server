@@ -3,6 +3,7 @@ package com.greenroom.moduleapi.controller.user;
 import com.greenroom.moduleapi.controller.user.UserRequest.JoinRequest;
 import com.greenroom.moduleapi.controller.user.UserResponse.JoinResponse;
 import com.greenroom.moduleapi.controller.user.UserResponse.UpdateProfileImageResponse;
+import com.greenroom.moduleapi.security.jwt.RefreshTokenService;
 import com.greenroom.moduleapi.security.oauth.*;
 import com.greenroom.moduleapi.service.user.UserService;
 import com.greenroom.modulecommon.entity.user.OAuthType;
@@ -11,6 +12,7 @@ import com.greenroom.modulecommon.jwt.JwtAuthentication;
 import com.greenroom.modulecommon.util.PresignerUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -26,6 +28,7 @@ public class UserApiController {
     private final NaverOAuthService naverOAuthService;
     private final AppleOAuthService appleOAuthService;
     private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
     private final PresignerUtils presignerUtils;
 
     /**
@@ -97,6 +100,16 @@ public class UserApiController {
         String profilePresignedUrl = presignerUtils.getPresignedPutUrl(user.getProfileImage());
 
         return UpdateProfileImageResponse.from(profilePresignedUrl);
+    }
+
+    /**
+     * 회원정보 삭제 API
+     */
+    @DeleteMapping
+    public void delete(@AuthenticationPrincipal JwtAuthentication authentication) {
+        userService.delete(authentication.getId());
+        refreshTokenService.deleteRefreshToken(authentication.getId());
+        SecurityContextHolder.clearContext();
     }
 
     /**

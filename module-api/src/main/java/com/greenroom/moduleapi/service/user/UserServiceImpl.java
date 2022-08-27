@@ -35,7 +35,13 @@ public class UserServiceImpl implements UserService {
         checkArgument(name != null, "name 값은 필수입니다.");
 
         if (userRepository.existsByOAuthIdAndType(oauthId, oauthType)) {
-            return getUserByOauthIdAndOauthType(oauthId, oauthType).getId();
+            User user = getUserByOauthIdAndOauthType(oauthId, oauthType);
+
+            if (user.isNotUsed()) {
+                throw new IllegalArgumentException("탈퇴한 회원은 한 달동안 재가입할 수 없습니다.");
+            }
+
+            return user.getId();
         }
 
         Category category = categoryService.getCategory(categoryId);
@@ -147,6 +153,17 @@ public class UserServiceImpl implements UserService {
         }
 
         throw new IllegalArgumentException("중복된 닉네임입니다.");
+    }
+
+    @Override
+    @Transactional
+    public Long delete(Long id) {
+        checkArgument(id != null, "id 값은 필수입니다.");
+
+        User user = getUser(id);
+        user.delete();
+
+        return user.getId();
     }
 
     @Override

@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.greenroom.modulecommon.constant.EntityConstant.UserQuestion.QUESTION_LENGTH;
@@ -46,6 +47,10 @@ public class UserQuestion extends AuditingCreateEntity {
 
     public int incrementAndGetParticipants() {
         return ++participants;
+    }
+
+    public Optional<User> getUser() {
+        return Optional.ofNullable(user);
     }
 
     public void update(Category category, String question) {
