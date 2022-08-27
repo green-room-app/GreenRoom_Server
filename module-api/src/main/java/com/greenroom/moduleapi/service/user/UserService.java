@@ -18,5 +18,7 @@ public interface UserService {
 
     Long updateProfileImage(Long id, String profileImage);
 
+    Long delete(Long id);
+
     boolean isUniqueName(String name);
 }

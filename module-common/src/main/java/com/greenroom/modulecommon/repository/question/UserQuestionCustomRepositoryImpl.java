@@ -30,7 +30,7 @@ public class UserQuestionCustomRepositoryImpl implements UserQuestionCustomRepos
     public List<UserQuestion> findAll(List<Long> categories, QuestionType questionType, Pageable pageable) {
         return jpaQueryFactory
                 .selectFrom(userQuestion)
-                    .join(userQuestion.user, user).fetchJoin()
+                    .leftJoin(userQuestion.user, user).fetchJoin()
                     .join(userQuestion.category, category).fetchJoin()
                 .where(
                     categoriesEq(categories),

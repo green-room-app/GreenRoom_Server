@@ -10,6 +10,7 @@ import com.greenroom.modulecommon.exception.EnumApiException;
 import com.greenroom.modulecommon.jwt.JwtAuthentication;
 import com.greenroom.modulecommon.util.PresignerUtils;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -74,7 +75,9 @@ public class PrivateQuestionApiController {
         List<GetResponse> responses = userQuestions
             .stream()
             .map(userQuestion -> {
-                String url = presignerUtils.getPresignedGetUrl(userQuestion.getUser().getProfileImage());
+                String url = userQuestion.getUser()
+                    .map(user -> presignerUtils.getPresignedGetUrl(user.getProfileImage()))
+                    .orElse(Strings.EMPTY);
                 return GetResponse.of(userQuestion, url);
         }).collect(toList());
 
@@ -91,7 +94,9 @@ public class PrivateQuestionApiController {
                                          @AuthenticationPrincipal JwtAuthentication authentication) {
 
         UserQuestionAnswer answer = userQuestionAnswerService.getUserQuestionAnswer(id, authentication.getId());
-        String url = presignerUtils.getPresignedGetUrl(answer.getUserQuestion().getUser().getProfileImage());
+        String url = answer.getUserQuestion().getUser()
+                .map(user -> presignerUtils.getPresignedGetUrl(user.getProfileImage()))
+                .orElse(Strings.EMPTY);
 
         return GetDetailResponse.of(answer, url);
     }

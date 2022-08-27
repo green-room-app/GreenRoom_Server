@@ -44,6 +44,11 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     private Authentication createUserAuthentication(String oauthId, OAuthType oAuthType) {
         try {
             User user = userService.getUserByOauthIdAndOauthType(oauthId, oAuthType);
+
+            if (user.isNotUsed()) {
+                throw new IllegalArgumentException("탈퇴한 계정입니다.");
+            }
+
             JwtAuthentication jwtAuthentication = JwtAuthentication.from(user);
             JwtAuthenticationToken authenticationToken =
                 JwtAuthenticationToken.of(jwtAuthentication, user.getOauthType(), createAuthorityList(Role.USER.value()));

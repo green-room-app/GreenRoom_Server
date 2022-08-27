@@ -102,7 +102,10 @@ public class UserQuestionServiceImpl implements UserQuestionService {
         checkArgument(userId != null, "userId 값은 필수입니다.");
 
         UserQuestion userQuestion = getUserQuestion(id);
-        return userId.equals(userQuestion.getUser().getId());
+
+        return userQuestion.getUser()
+                .map(user -> userId.equals(user.getId()))
+                .orElse(false);
     }
 
     @Override

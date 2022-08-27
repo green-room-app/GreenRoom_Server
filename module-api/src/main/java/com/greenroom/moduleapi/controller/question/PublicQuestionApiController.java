@@ -10,6 +10,7 @@ import com.greenroom.modulecommon.entity.scrap.Scrap;
 import com.greenroom.modulecommon.jwt.JwtAuthentication;
 import com.greenroom.modulecommon.util.PresignerUtils;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -56,7 +57,9 @@ public class PublicQuestionApiController {
         List<PopularQuestionResponse> responses = popularQuestions
             .stream()
             .map(userQuestion -> {
-                String url = presignerUtils.getPresignedGetUrl(userQuestion.getUser().getProfileImage());
+                String url = userQuestion.getUser()
+                    .map(user -> presignerUtils.getPresignedGetUrl(user.getProfileImage()))
+                    .orElse(Strings.EMPTY);
                 return PopularQuestionResponse.of(userQuestion, url);
         }).collect(toList());
 
@@ -78,7 +81,9 @@ public class PublicQuestionApiController {
         List<RecentQuestionResponse> responses = userQuestions
             .stream()
             .map(userQuestion -> {
-                String url = presignerUtils.getPresignedGetUrl(userQuestion.getUser().getProfileImage());
+                String url = userQuestion.getUser()
+                    .map(user -> presignerUtils.getPresignedGetUrl(user.getProfileImage()))
+                    .orElse(Strings.EMPTY);
                 return RecentQuestionResponse.of(userQuestion, url);
         }).collect(toList());
 
@@ -150,7 +155,9 @@ public class PublicQuestionApiController {
         List<ScrapQuestionResponse> responses = scraps
             .stream()
             .map(scrap -> {
-                String url = presignerUtils.getPresignedGetUrl(scrap.getUserQuestion().getUser().getProfileImage());
+                String url = scrap.getUserQuestion().getUser()
+                        .map(user -> presignerUtils.getPresignedGetUrl(user.getProfileImage()))
+                        .orElse(Strings.EMPTY);
                 return ScrapQuestionResponse.of(scrap, url);
         }).collect(toList());
 
@@ -183,7 +190,9 @@ public class PublicQuestionApiController {
         List<InvolveQuestionResponse> responses = userQuestionAnswers
             .stream()
             .map(answer -> {
-                String url = presignerUtils.getPresignedGetUrl(answer.getUserQuestion().getUser().getProfileImage());
+                String url = answer.getUserQuestion().getUser()
+                    .map(user -> presignerUtils.getPresignedGetUrl(user.getProfileImage()))
+                    .orElse(Strings.EMPTY);
                 return InvolveQuestionResponse.of(answer, url);
         }).collect(toList());
 
