@@ -45,7 +45,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         try {
             User user = userService.getUserByOauthIdAndOauthType(oauthId, oAuthType);
 
-            if (user.isNotUsed()) {
+            if (user.isDeleted()) {
                 throw new IllegalArgumentException("탈퇴한 계정입니다.");
             }
 
