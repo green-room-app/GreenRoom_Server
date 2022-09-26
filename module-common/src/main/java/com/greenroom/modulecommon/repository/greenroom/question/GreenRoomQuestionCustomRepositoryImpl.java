@@ -4,7 +4,10 @@ import com.greenroom.modulecommon.entity.greenroom.GreenRoomQuestion;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,19 +24,30 @@ public class GreenRoomQuestionCustomRepositoryImpl implements GreenRoomQuestionC
      * 내가 개설한 그린룸 조회
      */
     @Override
-    public List<GreenRoomQuestion> findAll(Long userId, Pageable pageable) {
-        return jpaQueryFactory
-            .selectFrom(greenRoomQuestion)
+    public Slice<GreenRoomQuestion> findMyGreenRoomQuestions(Long userId, Pageable pageable) {
+        List<GreenRoomQuestion> greenRoomQuestions = jpaQueryFactory
+                .selectFrom(greenRoomQuestion)
                 .leftJoin(greenRoomQuestion.user, user).fetchJoin()
                 .join(greenRoomQuestion.category, category).fetchJoin()
-            .where(
-                greenRoomQuestion.user.id.eq(userId),
-                greenRoomQuestion.isDeleted.eq(false)
-            )
-            .orderBy(greenRoomQuestion.id.desc())
-                .limit(pageable.getPageSize())
-                .offset(pageable.getOffset())
-            .fetch();
+                .where(
+                        greenRoomQuestion.user.id.eq(userId),
+                        greenRoomQuestion.isDeleted.eq(false)
+                )
+                .orderBy(greenRoomQuestion.id.desc())
+                    .limit(pageable.getPageSize() + 1) // limit보다 데이터를 1개 더 들고오기
+                    .offset(pageable.getOffset())
+                .fetch();
+
+        List<GreenRoomQuestion> contents = new ArrayList<>(greenRoomQuestions);
+
+        boolean hasNext = false;
+
+        if (contents.size() > pageable.getPageSize()) {
+            contents.remove(pageable.getPageSize());
+            hasNext = true;
+        }
+
+        return new SliceImpl<>(contents, pageable, hasNext);
     }
 
     @Override

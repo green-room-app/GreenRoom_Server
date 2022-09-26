@@ -1,15 +1,16 @@
 package com.greenroom.moduleapi.controller.myquestion;
 
+import com.greenroom.modulecommon.entity.group.QuestionGroup;
 import com.greenroom.modulecommon.entity.interview.InterviewQuestion;
-import com.greenroom.modulecommon.repository.interview.query.MyQuestionQueryDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 public class MyQuestionDto {
 
@@ -47,12 +48,17 @@ public class MyQuestionDto {
         private String categoryName;
         private String question;
 
-        public static GetResponse from(MyQuestionQueryDto questionQueryDto) {
+        public static GetResponse from(InterviewQuestion interviewQuestion) {
             return GetResponse.builder()
-                    .id(questionQueryDto.getId())
-                    .groupName(questionQueryDto.getGroupName())
-                    .groupCategoryName(questionQueryDto.getGroupCategoryName())
-                    .categoryName(questionQueryDto.getQuestionCategoryName())
+                    .id(interviewQuestion.getId())
+                    .groupName(interviewQuestion.getGroup()
+                        .map(QuestionGroup::getName)
+                        .orElse(EMPTY))
+                    .groupCategoryName(interviewQuestion.getGroup()
+                        .map(group -> group.getCategory().getName())
+                        .orElse(EMPTY))
+                    .categoryName(interviewQuestion.getCategory().getName())
+                    .question(interviewQuestion.getQuestion())
                     .build();
         }
     }
@@ -76,7 +82,7 @@ public class MyQuestionDto {
                     .groupCategoryName(
                         interviewQuestion.getGroup()
                             .map(group -> group.getCategory().getName())
-                            .orElse(StringUtils.EMPTY)
+                            .orElse(EMPTY)
                     )
                     .categoryName(interviewQuestion.getCategory().getName())
                     .question(interviewQuestion.getQuestion())

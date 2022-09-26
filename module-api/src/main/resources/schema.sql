@@ -55,6 +55,7 @@ CREATE TABLE greenroom_question_answers
 (
     id                  bigint          NOT NULL AUTO_INCREMENT COMMENT 'id',
     answer              varchar(500)    NOT NULL COMMENT '답변',
+    keywords            varchar(500)    DEFAULT NULL COMMENT '키워드',
     created_at          timestamp       NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일시',
     question_id         bigint          DEFAULT NULL COMMENT '그린룸 질문 id',
     user_id             bigint          DEFAULT NULL COMMENT '답변자 id',

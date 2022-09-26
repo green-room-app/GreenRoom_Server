@@ -85,11 +85,50 @@ public class GreenRoomQuestionScrapServiceImpl implements GreenRoomQuestionScrap
     }
 
     @Override
+    public boolean exist(Long questionId, Long userId) {
+        checkArgument(questionId != null, "questionId 값은 필수입니다.");
+        checkArgument(userId != null, "userId 값은 필수입니다.");
+
+        boolean exist = scrapRepository.exist(questionId, userId);
+
+        if (exist) {
+            GreenRoomQuestionScrap scrap = getScrap(questionId, userId);
+
+            if (scrap.isDeleted()) {
+                return false;
+            }
+        }
+
+        return exist;
+    }
+
+    @Override
     @Transactional
-    public void delete(Long id) {
+    public void delete(List<Long> ids, Long userId) {
+        checkArgument(ids != null, "ids 값은 필수입니다.");
+        checkArgument(userId != null, "userId 값은 필수입니다.");
+
+        for (Long id : ids) {
+            GreenRoomQuestionScrap scrap = getScrap(id);
+            boolean isOwner = scrap.getUser().map(user -> user.getId().equals(userId)).orElse(false);
+
+            if (isOwner) {
+                scrap.delete();
+            }
+        }
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id, Long userId) {
         checkArgument(id != null, "id 값은 필수입니다.");
+        checkArgument(userId != null, "userId 값은 필수입니다.");
 
         GreenRoomQuestionScrap scrap = getScrap(id);
-        scrap.delete();
+        boolean isOwner = scrap.getUser().map(user -> user.getId().equals(userId)).orElse(false);
+
+        if (isOwner) {
+            scrap.delete();
+        }
     }
 }

@@ -17,5 +17,9 @@ public interface GreenRoomQuestionScrapService {
 
     GreenRoomQuestionScrap getScrap(Long questionId, Long userId);
 
-    void delete(Long id);
+    boolean exist(Long questionId, Long userId);
+
+    void delete(List<Long> ids, Long userId);
+
+    void delete(Long id, Long userId);
 }

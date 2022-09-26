@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.greenroom.modulecommon.entity.group.QQuestionGroup.questionGroup;
 import static com.greenroom.modulecommon.entity.interview.QInterviewQuestion.interviewQuestion;
 import static com.greenroom.modulecommon.entity.interview.QuestionType.*;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
@@ -58,41 +57,6 @@ public class InterviewQuestionQueryRepository {
                 .fetch();
     }
 
-    /**
-     * B10 화면 마이 질문리스트 조회용 쿼리
-     *
-     * private Long id;
-     * private String groupCategoryName;
-     * private String groupName;
-     * private String questionCategoryName;
-     * private QuestionType questionType;
-     * private String question;
-     */
-    public List<MyQuestionQueryDto> findAll(Long userId, Pageable pageable) {
-        return jpaQueryFactory
-                .select(
-                        Projections.constructor(
-                            MyQuestionQueryDto.class,
-                            interviewQuestion.id,
-                            interviewQuestion.group == null ? null : interviewQuestion.group.category.name,
-                            interviewQuestion.group == null ? null : interviewQuestion.group.name,
-                            interviewQuestion.category.name,
-                            interviewQuestion.questionType,
-                            interviewQuestion.question
-                        )
-                ).from(interviewQuestion)
-                    .leftJoin(interviewQuestion.group, questionGroup)
-                .where(
-                    interviewQuestion.user.id.eq(userId),
-                    isMyQuestion(),
-                    interviewQuestion.isDeleted.eq(false)
-                )
-                .orderBy(interviewQuestion.id.desc())
-                    .limit(pageable.getPageSize())
-                    .offset(pageable.getOffset())
-                .fetch();
-    }
-
     private BooleanExpression categoriesEq(List<Long> categories) {
         if (isEmpty(categories)) {
             return null;
@@ -122,9 +86,5 @@ public class InterviewQuestionQueryRepository {
                 .or(interviewQuestion.user.id.eq(userId)
                         .and(interviewQuestion.questionType.eq(MY_QUESTION))
                 );
-    }
-
-    private BooleanExpression isMyQuestion() {
-        return interviewQuestion.questionType.in(MY_QUESTION, MY_QUESTION_WITH_GROUP);
     }
 }

@@ -35,6 +35,8 @@ public class GreenRoomQuestionAnswer extends AuditingCreateEntity {
 
     private String answer;
 
+    private String keywords;
+
     public Optional<User> getUser() {
         return Optional.ofNullable(user);
     }
@@ -43,7 +45,8 @@ public class GreenRoomQuestionAnswer extends AuditingCreateEntity {
     private GreenRoomQuestionAnswer(Long id,
                                     User user,
                                     GreenRoomQuestion greenRoomQuestion,
-                                    String answer) {
+                                    String answer,
+                                    String keywords) {
 
         checkArgument(user != null, "user 값은 필수입니다.");
         checkArgument(greenRoomQuestion != null, "publicQuestion 값은 필수입니다.");
@@ -55,5 +58,6 @@ public class GreenRoomQuestionAnswer extends AuditingCreateEntity {
         this.user = user;
         this.greenRoomQuestion = greenRoomQuestion;
         this.answer = answer;
+        this.keywords = keywords;
     }
 }

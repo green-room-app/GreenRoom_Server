@@ -109,7 +109,7 @@ public class InterviewQuestion extends AuditingCreateUpdateEntity {
     /**
      * 그린룸 질문 그룹에 담기
      */
-    public static InterviewQuestion ofGreenRoom(User user, Category category, QuestionGroup group, String question, String answer) {
+    public static InterviewQuestion ofGreenRoom(User user, Category category, QuestionGroup group, String question, String answer, String keywords) {
         return InterviewQuestion.builder()
                 .user(user)
                 .category(category)
@@ -117,7 +117,7 @@ public class InterviewQuestion extends AuditingCreateUpdateEntity {
                 .questionType(GREENROOM_QUESTION)
                 .question(question)
                 .answer(answer)
-                .keywords(null)
+                .keywords(keywords)
                 .build();
     }
 

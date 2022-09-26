@@ -23,6 +23,9 @@ public interface InterviewQuestionService {
      */
     Long createMyQuestionWithoutGroup(Long categoryId, Long userId, String question);
 
+    //특정 사용자의 my 질문 list 조회
+    List<InterviewQuestion> getMyQuestions(Long userId, Pageable pageable);
+
     //한 그룹 안에 들어있는 면접 질문 list 조회
     List<InterviewQuestion> getInterviewQuestions(Long groupId, Long userId, Pageable pageable);
 
@@ -34,19 +37,15 @@ public interface InterviewQuestionService {
      */
     Long updateAnswerAndKeywords(Long id, String answer, List<String> keywordList);
 
-    List<String> toKeywordList(String keywords);
-
-    String toKeywords(List<String> keywordList);
-
-    void updateGroups(Long groupId, List<Long> ids);
+    void updateGroups(Long groupId, List<Long> ids, Long userId);
     /**
      * 그룹이동 C5-3
      */
     Long updateGroup(Long id, Long groupId);
 
-
     boolean isOwner(Long id, Long userId);
 
+    void delete(Long groupId, List<Long> ids, Long userId);
     /**
      * 질문삭제 C5-3
      */

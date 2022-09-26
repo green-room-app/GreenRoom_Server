@@ -7,6 +7,7 @@ import com.greenroom.modulecommon.entity.greenroom.GreenRoomQuestionAnswer;
 import com.greenroom.modulecommon.entity.user.User;
 import com.greenroom.modulecommon.exception.ApiException;
 import com.greenroom.modulecommon.repository.greenroom.answer.GreenRoomQuestionAnswerRepository;
+import com.greenroom.modulecommon.util.KeywordUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,22 +30,24 @@ public class GreenRoomQuestionAnswerServiceImpl implements GreenRoomQuestionAnsw
 
     @Override
     @Transactional
-    public Long create(Long questionId, String answer, Long userId) {
+    public Long create(Long questionId, Long userId, String answer, List<String> keywordList) {
         checkArgument(questionId != null, "questionId 값은 필수입니다.");
+        checkArgument(userId != null, "userId 값은 필수입니다.");
         checkArgument(answer != null, "answer 값은 필수입니다.");
         checkArgument(answer.length() <= ANSWER_LENGTH, String.format("answer 길이는 %s자 이하여야 합니다.", ANSWER_LENGTH));
-        checkArgument(userId != null, "userId 값은 필수입니다.");
 
-        if (exist(questionId, userId)) {
-            //FIXME: throw exception
+        if (isParticipated(questionId, userId)) {
+            throw new IllegalStateException("이미 등록한 답변이 있습니다.");
         }
 
         GreenRoomQuestion greenRoomQuestion = greenRoomQuestionService.getGreenRoomQuestion(questionId);
         User user = userService.getUser(userId);
+        String keywords = KeywordUtils.toKeywords(keywordList);
 
         GreenRoomQuestionAnswer greenRoomQuestionAnswer = GreenRoomQuestionAnswer.builder()
                 .greenRoomQuestion(greenRoomQuestion)
                 .answer(answer)
+                .keywords(keywords)
                 .user(user)
                 .build();
 
@@ -52,10 +55,18 @@ public class GreenRoomQuestionAnswerServiceImpl implements GreenRoomQuestionAnsw
     }
 
     @Override
-    public List<GreenRoomQuestionAnswer> getAnswers(Long userId, Pageable pageable) {
+    public List<GreenRoomQuestionAnswer> getAnswers(List<Long> categoryIds, Long userId, Pageable pageable) {
         checkArgument(userId != null, "userId 값은 필수입니다.");
 
-        return answerRepository.findAll(userId, pageable);
+        return answerRepository.findAll(categoryIds, userId, pageable);
+    }
+
+    @Override
+    public List<GreenRoomQuestionAnswer> getAnswers(Long questionId, Long userId, Pageable pageable) {
+        checkArgument(questionId != null, "questionId 값은 필수입니다.");
+        checkArgument(userId != null, "userId 값은 필수입니다.");
+
+        return answerRepository.findAll(questionId, userId, pageable);
     }
 
     @Override
@@ -82,7 +93,7 @@ public class GreenRoomQuestionAnswerServiceImpl implements GreenRoomQuestionAnsw
     }
 
     @Override
-    public boolean exist(Long questionId, Long userId) {
+    public boolean isParticipated(Long questionId, Long userId) {
         checkArgument(questionId != null, "questionId 값은 필수입니다.");
         checkArgument(userId != null, "userId 값은 필수입니다.");
 

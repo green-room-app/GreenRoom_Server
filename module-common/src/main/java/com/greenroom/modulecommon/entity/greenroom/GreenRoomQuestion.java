@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -39,6 +41,9 @@ public class GreenRoomQuestion extends AuditingCreateEntity {
     private LocalDateTime expiredAt;
 
     private boolean isDeleted;
+
+    @OneToMany(mappedBy = "greenRoomQuestion", cascade = CascadeType.ALL)
+    private List<GreenRoomQuestionAnswer> questionAnswers = new ArrayList<>();
 
     public void delete() {
         this.isDeleted = true;

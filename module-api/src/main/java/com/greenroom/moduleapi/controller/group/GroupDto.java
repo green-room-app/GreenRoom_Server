@@ -41,6 +41,13 @@ public class GroupDto {
         private List<Long> ids = new ArrayList<>();
     }
 
+    @Getter
+    public static class DeleteRequest {
+        @NotNull(message = "groupId 값은 필수입니다.")
+        private Long groupId;
+        @Size(max = 10)
+        private List<Long> ids = new ArrayList<>();
+    }
 
     @Getter
     @AllArgsConstructor

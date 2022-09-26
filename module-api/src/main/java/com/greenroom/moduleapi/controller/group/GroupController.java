@@ -105,6 +105,11 @@ public class GroupController {
         return GetDetailResponse.of(group, questions);
     }
 
+    /**
+     * 사용자는 그룹에 속한 질문을 다른 그룹으로 변경할 수 있다
+     *
+     * POST /api/groups/move-questions
+     */
     @PostMapping("/move-questions")
     public void moveGroupQuestions(@AuthenticationPrincipal JwtAuthentication authentication,
                                    @Valid @RequestBody GroupDto.MoveRequest request) {
@@ -113,6 +118,22 @@ public class GroupController {
             throw new ApiException(FORBIDDEN, "그룹 생성자만 질문을 이동시킬 수 있습니다");
         }
 
-        interviewQuestionService.updateGroups(request.getGroupId(), request.getIds());
+        interviewQuestionService.updateGroups(request.getGroupId(), request.getIds(), authentication.getId());
+    }
+
+    /**
+     * 사용자는 그룹에 속한 질문을 삭제할 수 있다
+     *
+     * POST /api/groups/delete-questions
+     */
+    @PostMapping("/delete-questions")
+    public void deleteGroupQuestions(@AuthenticationPrincipal JwtAuthentication authentication,
+                                     @Valid @RequestBody GroupDto.DeleteRequest request) {
+
+        if (!questionGroupService.isOwner(request.getGroupId(), authentication.getId())) {
+            throw new ApiException(FORBIDDEN, "그룹 생성자만 질문을 삭제할 수 있습니다");
+        }
+
+        interviewQuestionService.delete(request.getGroupId(), request.getIds(), authentication.getId());
     }
 }

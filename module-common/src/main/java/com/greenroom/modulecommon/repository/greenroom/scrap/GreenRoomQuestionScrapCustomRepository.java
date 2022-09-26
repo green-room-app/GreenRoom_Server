@@ -12,6 +12,8 @@ public interface GreenRoomQuestionScrapCustomRepository {
     Optional<GreenRoomQuestionScrap> find(Long id);
 
     Optional<GreenRoomQuestionScrap> find(Long questionId, Long userId);
-
+    /**
+     * 그린룸질문 스크랩 여부 판단
+     */
     boolean exist(Long questionId, Long userId);
 }

@@ -2,7 +2,6 @@ package com.greenroom.moduleapi.controller.myquestion;
 
 import com.greenroom.moduleapi.controller.myquestion.MyQuestionDto.*;
 import com.greenroom.moduleapi.service.interview.InterviewQuestionService;
-import com.greenroom.moduleapi.service.interview.query.InterviewQuestionQueryService;
 import com.greenroom.modulecommon.entity.interview.InterviewQuestion;
 import com.greenroom.modulecommon.exception.ApiException;
 import com.greenroom.modulecommon.jwt.JwtAuthentication;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-import static com.greenroom.modulecommon.entity.interview.QuestionType.MY_QUESTION;
 import static com.greenroom.modulecommon.exception.EnumApiException.FORBIDDEN;
 import static java.util.stream.Collectors.toList;
 
@@ -24,7 +22,6 @@ import static java.util.stream.Collectors.toList;
 public class MyQuestionController {
 
     private final InterviewQuestionService interviewQuestionService;
-    private final InterviewQuestionQueryService interviewQuestionQueryService;
 
     /**
      * 사용자는 자신이 작성한 마이질문(나만 볼 수 있는 질문) 목록을 조회할 수 있다 (B10 화면)
@@ -35,7 +32,7 @@ public class MyQuestionController {
     public List<GetResponse> getMyQuestions(@AuthenticationPrincipal JwtAuthentication authentication,
                                             Pageable pageable) {
 
-        return interviewQuestionQueryService.findAll(authentication.getId(), pageable)
+        return interviewQuestionService.getMyQuestions(authentication.getId(), pageable)
                 .stream()
                 .map(GetResponse::from)
                 .collect(toList());

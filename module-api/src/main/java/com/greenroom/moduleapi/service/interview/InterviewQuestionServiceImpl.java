@@ -14,25 +14,22 @@ import com.greenroom.modulecommon.entity.interview.QuestionType;
 import com.greenroom.modulecommon.entity.user.User;
 import com.greenroom.modulecommon.exception.ApiException;
 import com.greenroom.modulecommon.repository.interview.InterviewQuestionRepository;
+import com.greenroom.modulecommon.util.KeywordUtils;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.greenroom.modulecommon.constant.EntityConstant.Question.QUESTION_LENGTH;
 import static com.greenroom.modulecommon.constant.EntityConstant.QuestionAnswer.ANSWER_LENGTH;
 import static com.greenroom.modulecommon.constant.EntityConstant.QuestionAnswer.KEYWORDS_LENGTH;
+import static com.greenroom.modulecommon.entity.interview.QuestionType.BASIC_QUESTION;
+import static com.greenroom.modulecommon.entity.interview.QuestionType.MY_QUESTION;
 import static com.greenroom.modulecommon.exception.EnumApiException.NOT_FOUND;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -57,13 +54,25 @@ public class InterviewQuestionServiceImpl implements InterviewQuestionService {
         GreenRoomQuestion greenRoomQuestion = greenRoomQuestionService.getGreenRoomQuestion(greenRoomQuestionId);
         QuestionGroup group = groupService.getGroup(groupId);
 
-        if (greenRoomQuestionAnswerService.exist(greenRoomQuestion.getId(), userId)) {
+        if (greenRoomQuestionAnswerService.isParticipated(greenRoomQuestion.getId(), userId)) {
             GreenRoomQuestionAnswer answer = greenRoomQuestionAnswerService.getAnswer(greenRoomQuestion.getId(), userId);
-            InterviewQuestion interviewQuestion = InterviewQuestion.ofGreenRoom(user, greenRoomQuestion.getCategory(), group, greenRoomQuestion.getQuestion(), answer.getAnswer());
+            InterviewQuestion interviewQuestion = InterviewQuestion.ofGreenRoom(user,
+                                                                                greenRoomQuestion.getCategory(),
+                                                                                group,
+                                                                                greenRoomQuestion.getQuestion(),
+                                                                                answer.getAnswer(),
+                                                                                answer.getKeywords());
+
             return interviewQuestionRepository.save(interviewQuestion).getId();
         }
 
-        InterviewQuestion interviewQuestion = InterviewQuestion.ofGreenRoom(user, greenRoomQuestion.getCategory(), group, greenRoomQuestion.getQuestion(), EMPTY);
+        InterviewQuestion interviewQuestion = InterviewQuestion.ofGreenRoom(user,
+                                                                            greenRoomQuestion.getCategory(),
+                                                                            group,
+                                                                            greenRoomQuestion.getQuestion(),
+                                                                            EMPTY,
+                                                                            EMPTY);
+
         return interviewQuestionRepository.save(interviewQuestion).getId();
     }
 
@@ -77,7 +86,7 @@ public class InterviewQuestionServiceImpl implements InterviewQuestionService {
         User user = userService.getUser(userId);
         InterviewQuestion basicQuestion = getInterviewQuestion(basicQuestionId);
 
-        if (!basicQuestion.getQuestionType().equals(QuestionType.BASIC_QUESTION)) {
+        if (!basicQuestion.getQuestionType().equals(BASIC_QUESTION)) {
             throw new IllegalArgumentException("기본 질문이 아닙니다");
         }
 
@@ -99,7 +108,7 @@ public class InterviewQuestionServiceImpl implements InterviewQuestionService {
         User user = userService.getUser(userId);
         InterviewQuestion myQuestion = getInterviewQuestion(myQuestionId);
 
-        if (!myQuestion.getQuestionType().equals(QuestionType.MY_QUESTION)) {
+        if (!myQuestion.getQuestionType().equals(MY_QUESTION)) {
             throw new IllegalArgumentException("그룹이 없는 마이질문이 아닙니다");
         }
 
@@ -124,6 +133,13 @@ public class InterviewQuestionServiceImpl implements InterviewQuestionService {
         InterviewQuestion interviewQuestion = InterviewQuestion.ofMyQuestionWithoutGroup(user, category, question);
 
         return interviewQuestionRepository.save(interviewQuestion).getId();
+    }
+
+    @Override
+    public List<InterviewQuestion> getMyQuestions(Long userId, Pageable pageable) {
+        checkArgument(userId != null, "userId 값은 필수입니다.");
+
+        return interviewQuestionRepository.findAllMyQuestions(userId, pageable);
     }
 
     @Override
@@ -169,7 +185,7 @@ public class InterviewQuestionServiceImpl implements InterviewQuestionService {
                 answer == null || answer.length() <= ANSWER_LENGTH,
                 String.format("answer 길이는 %s자 이하여야 합니다.", ANSWER_LENGTH));
 
-        String keywords = toKeywords(keywordList);
+        String keywords = KeywordUtils.toKeywords(keywordList);
         checkArgument(keywords.length() <= KEYWORDS_LENGTH,
                 String.format("keywords 길이는 %s자 이하여야 합니다.", KEYWORDS_LENGTH));
 
@@ -180,42 +196,21 @@ public class InterviewQuestionServiceImpl implements InterviewQuestionService {
     }
 
     @Override
-    public List<String> toKeywordList(String keywords) {
-        if (isEmpty(keywords)) {
-            return Collections.emptyList();
-        }
-
-        return Arrays.stream(keywords.split("-"))
-                .collect(toList());
-    }
-
-    @Override
-    public String toKeywords(List<String> keywordList) {
-        if (keywordList == null) {
-            return EMPTY;
-        }
-
-        StringBuilder sb = new StringBuilder();
-
-        keywordList.forEach(keyword -> {
-            sb.append(keyword).append("-");
-        });
-
-        String keywords = sb.toString();
-        return keywords.substring(0, keywords.length() - 1);
-    }
-
-    @Override
     @Transactional
-    public void updateGroups(Long groupId, List<Long> ids) {
+    public void updateGroups(Long groupId, List<Long> ids, Long userId) {
         checkArgument(groupId != null, "groupId 값은 필수입니다.");
         checkArgument(ids != null, "ids 값은 필수입니다.");
+        checkArgument(userId != null, "userId 값은 필수입니다.");
 
         QuestionGroup group = groupService.getGroup(groupId);
 
         for (Long id : ids) {
             InterviewQuestion interviewQuestion = getInterviewQuestion(id);
-            interviewQuestion.updateGroup(group);
+            boolean isOwner = interviewQuestion.getUser().map(user -> user.getId().equals(userId)).orElse(false);
+
+            if (isOwner) {
+                interviewQuestion.updateGroup(group);
+            }
         }
     }
 
@@ -241,6 +236,29 @@ public class InterviewQuestionServiceImpl implements InterviewQuestionService {
 
         return interviewQuestion.getUser().map(user -> userId.equals(user.getId()))
             .orElse(false);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long groupId, List<Long> ids, Long userId) {
+        checkArgument(groupId != null, "groupId 값은 필수입니다.");
+        checkArgument(ids != null, "ids 값은 필수입니다.");
+        checkArgument(userId != null, "userId 값은 필수입니다.");
+
+        for (Long id : ids) {
+            InterviewQuestion interviewQuestion = getInterviewQuestion(id);
+            boolean isOwner = interviewQuestion.getUser()
+                    .map(user -> user.getId().equals(userId))
+                    .orElse(false);
+
+            boolean isInGroup = interviewQuestion.getGroup()
+                    .map(group -> group.getId().equals(groupId))
+                    .orElse(false);
+
+            if (isOwner && isInGroup) {
+                interviewQuestion.delete();
+            }
+        }
     }
 
     @Override

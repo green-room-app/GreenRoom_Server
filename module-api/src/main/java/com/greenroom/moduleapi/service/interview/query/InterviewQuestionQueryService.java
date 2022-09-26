@@ -3,7 +3,6 @@ package com.greenroom.moduleapi.service.interview.query;
 import com.greenroom.modulecommon.repository.interview.query.InterviewQuestionQueryDto;
 import com.greenroom.modulecommon.repository.interview.query.InterviewQuestionQueryRepository;
 import com.greenroom.moduleapi.controller.interview.InterviewQuestionSearchOption;
-import com.greenroom.modulecommon.repository.interview.query.MyQuestionQueryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,11 +26,5 @@ public class InterviewQuestionQueryService {
         checkArgument(userId != null, "userId 값은 필수입니다.");
 
         return questionQueryRepository.findAll(userId, searchOption.getCategories(), searchOption.getTitle(), pageable);
-    }
-
-    public List<MyQuestionQueryDto> findAll(Long userId, Pageable pageable) {
-        checkArgument(userId != null, "userId 값은 필수입니다.");
-
-        return questionQueryRepository.findAll(userId, pageable);
     }
 }
