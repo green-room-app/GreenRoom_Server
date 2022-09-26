@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByOAuthIdAndType(oauthId, oauthType)) {
             User user = getUserByOauthIdAndOauthType(oauthId, oauthType);
 
-            if (user.isNotUsed()) {
+            if (user.isDeleted()) {
                 throw new IllegalArgumentException("탈퇴한 회원은 한 달동안 재가입할 수 없습니다.");
             }
 

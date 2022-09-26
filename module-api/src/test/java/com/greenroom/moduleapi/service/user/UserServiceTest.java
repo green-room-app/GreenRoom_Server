@@ -475,14 +475,14 @@ class UserServiceTest {
             given(userRepository.find(anyLong())).willReturn(Optional.ofNullable(user));
 
             Long deleteUserId = user.getId();
-            assertThat(user.isUsed()).isTrue();
+            assertThat(user.isDeleted()).isTrue();
             assertThat(user.getWithdrawalDate()).isNull();
 
 
             //when
             userService.delete(deleteUserId);
 
-            assertThat(user.isUsed()).isFalse();
+            assertThat(user.isDeleted()).isFalse();
             assertThat(user.getWithdrawalDate()).isNotNull();
 
             //then

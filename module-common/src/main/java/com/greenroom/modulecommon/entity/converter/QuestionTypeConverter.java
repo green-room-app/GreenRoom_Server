@@ -1,6 +1,6 @@
 package com.greenroom.modulecommon.entity.converter;
 
-import com.greenroom.modulecommon.entity.question.QuestionType;
+import com.greenroom.modulecommon.entity.interview.QuestionType;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

@@ -1,7 +1,7 @@
 package com.greenroom.moduleapi.config;
 
-import com.greenroom.moduleapi.config.support.PublicQuestionSearchArgumentResolver;
-import com.greenroom.moduleapi.config.support.QuestionSearchArgumentResolver;
+import com.greenroom.moduleapi.config.support.CategorySearchArgumentResolver;
+import com.greenroom.moduleapi.config.support.InterviewQuestionSearchArgumentResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -14,17 +14,17 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-        argumentResolvers.add(publicQuestionSearchArgumentResolver());
         argumentResolvers.add(questionSearchArgumentResolver());
+        argumentResolvers.add(categorySearchArgumentResolver());
     }
 
     @Bean
-    public PublicQuestionSearchArgumentResolver publicQuestionSearchArgumentResolver() {
-        return new PublicQuestionSearchArgumentResolver();
+    public InterviewQuestionSearchArgumentResolver questionSearchArgumentResolver() {
+        return new InterviewQuestionSearchArgumentResolver();
     }
 
     @Bean
-    public QuestionSearchArgumentResolver questionSearchArgumentResolver() {
-        return new QuestionSearchArgumentResolver();
+    public CategorySearchArgumentResolver categorySearchArgumentResolver() {
+        return new CategorySearchArgumentResolver();
     }
 }

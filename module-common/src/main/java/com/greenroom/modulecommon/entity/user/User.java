@@ -42,7 +42,7 @@ public class User extends AuditingCreateUpdateEntity {
     @Column(length = PROFILE_IMAGE_LENGTH)
     private String profileImage;
 
-    private boolean used;
+    private boolean isDeleted;
 
     private LocalDate withdrawalDate;
 
@@ -77,12 +77,8 @@ public class User extends AuditingCreateUpdateEntity {
     }
 
     public void delete() {
-        this.used = false;
+        this.isDeleted = true;
         this.withdrawalDate = LocalDate.now();
-    }
-
-    public boolean isNotUsed() {
-        return !this.used;
     }
 
     @Builder
@@ -98,6 +94,6 @@ public class User extends AuditingCreateUpdateEntity {
         this.oauthId = oauthId;
         this.category = category;
         this.name = name;
-        this.used = true;
+        this.isDeleted = false;
     }
 }
