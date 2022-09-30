@@ -1,5 +1,6 @@
 package com.greenroom.modulecommon.controller;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.greenroom.modulecommon.exception.ApiException;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +42,7 @@ public class GlobalExceptionHandler {
             TypeMismatchException.class, HttpMessageNotReadableException.class,
             MissingServletRequestParameterException.class, MultipartException.class,
             AuthenticationException.class, DateTimeParseException.class,
-            HttpRequestMethodNotSupportedException.class, JwtException.class
+            HttpRequestMethodNotSupportedException.class, JwtException.class, JWTVerificationException.class
     })
     public ResponseEntity<?> handleBadRequestException(Exception e) {
         String message = e.getMessage();
