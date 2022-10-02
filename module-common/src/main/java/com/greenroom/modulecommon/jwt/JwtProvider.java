@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -49,8 +50,8 @@ public class JwtProvider {
         return createTokenByClaims(claims);
     }
 
-    public String createRenewedAccessToken(String accessToken) throws JWTVerificationException {
-        Claims claims = verify(accessToken);
+    public String createRenewedAccessToken(String accessToken) throws JWTDecodeException {
+        Claims claims = decode(accessToken);
         claims.eraseIat();
         claims.eraseExp();
         return createTokenByClaims(claims);
@@ -84,6 +85,10 @@ public class JwtProvider {
         builder.withClaim("oauthId", claims.oauthId);
         builder.withArrayClaim("roles", claims.roles);
         return builder.sign(algorithm);
+    }
+
+    public Claims decode(String token) throws JWTDecodeException {
+        return new Claims(JWT.decode(token));
     }
 
     public boolean verifyToken(String token) {

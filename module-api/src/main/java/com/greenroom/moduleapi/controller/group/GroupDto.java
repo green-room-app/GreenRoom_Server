@@ -64,14 +64,14 @@ public class GroupDto {
     public static class GetResponse {
         private Long id;
         private String name;
-        private String categoryName;
+        private Long categoryId;
         private Integer questionCnt;
 
         public static GetResponse from(QuestionGroup group) {
             return GetResponse.builder()
                     .id(group.getId())
                     .name(group.getName())
-                    .categoryName(group.getCategory().getName())
+                    .categoryId(group.getCategory().getId())
                     .questionCnt(group.getInterviewQuestions().size())
                     .build();
         }

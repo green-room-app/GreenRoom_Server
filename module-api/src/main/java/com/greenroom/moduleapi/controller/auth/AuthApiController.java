@@ -1,5 +1,6 @@
 package com.greenroom.moduleapi.controller.auth;
 
+import com.greenroom.moduleapi.security.jwt.AuthService;
 import com.greenroom.moduleapi.security.jwt.RefreshTokenService;
 import com.greenroom.moduleapi.security.oauth.*;
 import com.greenroom.modulecommon.entity.user.OAuthType;
@@ -25,6 +26,7 @@ import static com.greenroom.modulecommon.exception.EnumApiException.FORBIDDEN;
 @RestController
 public class AuthApiController {
 
+    private final AuthService authService;
     private final KakaoOAuthService kakaoOAuthService;
     private final NaverOAuthService naverOAuthService;
     private final AppleOAuthService appleOAuthService;
@@ -66,14 +68,15 @@ public class AuthApiController {
     }
 
     @PostMapping("/reissue")
-    public AuthDto.ReissueResponse reissue(@AuthenticationPrincipal JwtAuthentication authentication,
-                                           @Valid @RequestBody AuthDto.ReissueRequest reissueRequest) {
+    public AuthDto.ReissueResponse reissue(@Valid @RequestBody AuthDto.ReissueRequest reissueRequest) {
 
         if (!jwtProvider.verifyToken(reissueRequest.getRefreshToken())) {
             throw new ApiException(FORBIDDEN, "Invalid refreshToken");
         }
 
-        String refreshToken = refreshTokenService.getRefreshToken(authentication.getId());
+        Long id = authService.getId(reissueRequest.getAccessToken());
+
+        String refreshToken = refreshTokenService.getRefreshToken(id);
 
         if (!refreshToken.equals(reissueRequest.getRefreshToken())) {
             throw new ApiException(FORBIDDEN, "Mismatched refreshToken");
@@ -82,7 +85,7 @@ public class AuthApiController {
         String renewedAccessToken = jwtProvider.createRenewedAccessToken(reissueRequest.getAccessToken());
         String newRefreshToken = jwtProvider.createRefreshToken();
 
-        refreshTokenService.saveRefreshToken(authentication.getId(), newRefreshToken);
+        refreshTokenService.saveRefreshToken(id, newRefreshToken);
         SecurityContextHolder.clearContext();
 
         AuthDto.ReissueResponse reissueResponse = AuthDto.ReissueResponse.builder()
