@@ -2,6 +2,7 @@ package com.greenroom.moduleapi.controller.group;
 
 import com.greenroom.modulecommon.entity.group.QuestionGroup;
 import com.greenroom.modulecommon.entity.interview.InterviewQuestion;
+import com.greenroom.modulecommon.util.KeywordUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -108,6 +109,8 @@ public class GroupDto {
         private String categoryName;
         private boolean isRegister;
         private String question;
+        private String answer;
+        private List<String> keywords;
 
         public static GroupQuestionResponse from(InterviewQuestion interviewQuestion) {
             return GroupQuestionResponse.builder()
@@ -115,6 +118,8 @@ public class GroupDto {
                     .categoryName(interviewQuestion.getCategory().getName())
                     .isRegister(isNotEmpty(interviewQuestion.getKeywords()))
                     .question(interviewQuestion.getQuestion())
+                    .answer(interviewQuestion.getAnswer())
+                    .keywords(KeywordUtils.toKeywordList(interviewQuestion.getKeywords()))
                     .build();
         }
     }

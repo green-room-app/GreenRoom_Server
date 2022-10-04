@@ -1,11 +1,11 @@
 package com.greenroom.moduleapi.controller.interview;
 
-import com.greenroom.moduleapi.controller.interview.InterviewQuestionDto.CreateRequest;
-import com.greenroom.moduleapi.controller.interview.InterviewQuestionDto.CreateResponse;
-import com.greenroom.moduleapi.controller.interview.InterviewQuestionDto.GetResponse;
+import com.greenroom.moduleapi.controller.interview.InterviewQuestionDto.*;
+import com.greenroom.moduleapi.controller.myquestion.MyQuestionDto;
 import com.greenroom.moduleapi.service.interview.InterviewQuestionService;
 import com.greenroom.moduleapi.service.interview.query.InterviewQuestionQueryService;
 import com.greenroom.modulecommon.entity.interview.QuestionType;
+import com.greenroom.modulecommon.exception.ApiException;
 import com.greenroom.modulecommon.jwt.JwtAuthentication;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +16,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 import static com.greenroom.modulecommon.entity.interview.QuestionType.BASIC_QUESTION;
+import static com.greenroom.modulecommon.exception.EnumApiException.FORBIDDEN;
 import static java.util.stream.Collectors.toList;
 
 @RequestMapping("/api/interview-questions")
@@ -40,6 +41,26 @@ public class InterviewQuestionController {
                 .stream()
                 .map(InterviewQuestionDto.GetResponse::from)
                 .collect(toList());
+    }
+
+    /**
+     * 사용자는 면접 연습용 질문에 대한 답변/키워드를 등록/수정할 수 있다
+     *
+     * PUT /api/interview-questions/{id}
+     */
+    @PutMapping("/{id}")
+    public UpdateResponse updateInterviewQuestions(@PathVariable("id") Long id,
+                                                   @AuthenticationPrincipal JwtAuthentication authentication,
+                                                   @Valid @RequestBody UpdateAnswerAndKeywordsRequest request) {
+
+        if (!questionService.isOwner(id, authentication.getId())) {
+            throw new ApiException(FORBIDDEN, "질문 생성자만 질문을 수정할 수 있습니다");
+        }
+
+        Long updatedId = questionService.updateAnswerAndKeywords(id, request.getAnswer(), request.getKeywords());
+
+        return UpdateResponse.from(updatedId);
+
     }
 
     /**
