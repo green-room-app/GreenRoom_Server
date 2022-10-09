@@ -5,6 +5,7 @@ import com.greenroom.moduleapi.service.greenroom.answer.GreenRoomQuestionAnswerS
 import com.greenroom.moduleapi.service.greenroom.answer.query.GreenRoomQuestionAnswerQueryService;
 import com.greenroom.moduleapi.service.greenroom.question.GreenRoomQuestionService;
 import com.greenroom.moduleapi.service.greenroom.question.query.GreenRoomQuestionQueryService;
+import com.greenroom.moduleapi.service.greenroom.question.search.GreenRoomQuestionSearchService;
 import com.greenroom.moduleapi.service.greenroom.scrap.GreenRoomQuestionScrapService;
 import com.greenroom.moduleapi.service.interview.InterviewQuestionService;
 import com.greenroom.modulecommon.entity.greenroom.GreenRoomQuestion;
@@ -40,6 +41,7 @@ public class GreenRoomQuestionController {
     private final GreenRoomQuestionAnswerService answerService;
     private final GreenRoomQuestionAnswerQueryService answerQueryService;
     private final GreenRoomQuestionScrapService scrapService;
+    private final GreenRoomQuestionSearchService questionSearchService;
 
     private final InterviewQuestionService interviewQuestionService;
     private final PresignerUtils presignerUtils;
@@ -305,7 +307,18 @@ public class GreenRoomQuestionController {
         }).collect(toList());
     }
 
-
+    /**
+     * 인기 검색어 목록을 조회할 수 있다
+     */
+    /**
+     * 인기 검색어 목록을 조회할 수 있다
+     *
+     * GET /api/green-questions/popular-search-words
+     */
+    @GetMapping("/popular-search-words")
+    public List<String> getPopularSearchWords() {
+        return questionSearchService.getPopularSearchWords();
+    }
 
     @DeleteMapping("/{id}")
     public void deleteGreenRoomQuestion(@PathVariable("id") Long id,
