@@ -10,12 +10,12 @@ import com.greenroom.modulecommon.entity.greenroom.GreenRoomQuestion;
 import com.greenroom.modulecommon.entity.greenroom.GreenRoomQuestionAnswer;
 import com.greenroom.modulecommon.entity.group.QuestionGroup;
 import com.greenroom.modulecommon.entity.interview.InterviewQuestion;
-import com.greenroom.modulecommon.entity.interview.QuestionType;
 import com.greenroom.modulecommon.entity.user.User;
 import com.greenroom.modulecommon.exception.ApiException;
 import com.greenroom.modulecommon.repository.interview.InterviewQuestionRepository;
 import com.greenroom.modulecommon.util.KeywordUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -143,7 +143,7 @@ public class InterviewQuestionServiceImpl implements InterviewQuestionService {
     }
 
     @Override
-    public List<InterviewQuestion> getInterviewQuestions(Long groupId, Long userId, Pageable pageable) {
+    public Page<InterviewQuestion> getInterviewQuestions(Long groupId, Long userId, Pageable pageable) {
         checkArgument(groupId != null, "groupId 값은 필수입니다.");
         checkArgument(userId != null, "userId 값은 필수입니다.");
 

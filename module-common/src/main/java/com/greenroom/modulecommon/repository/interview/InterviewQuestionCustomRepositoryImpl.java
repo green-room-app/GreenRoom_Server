@@ -4,6 +4,8 @@ import com.greenroom.modulecommon.entity.interview.InterviewQuestion;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -42,20 +44,35 @@ public class InterviewQuestionCustomRepositoryImpl implements InterviewQuestionC
     }
 
     @Override
-    public List<InterviewQuestion> findAll(Long groupId, Long userId, Pageable pageable) {
-        return jpaQueryFactory
+    public Page<InterviewQuestion> findAll(Long groupId, Long userId, Pageable pageable) {
+        List<InterviewQuestion> contents = jpaQueryFactory
+            .selectFrom(interviewQuestion)
+                .join(interviewQuestion.group, questionGroup).fetchJoin()
+                .join(interviewQuestion.category, category).fetchJoin()
+            .where(
+                interviewQuestion.group.id.eq(groupId),
+                interviewQuestion.user.id.eq(userId),
+                interviewQuestion.isDeleted.eq(false)
+            )
+            .orderBy(interviewQuestion.id.desc())
+            .limit(pageable.getPageSize())
+            .offset(pageable.getOffset())
+            .fetch();
+
+        Long count = getCount(groupId, userId);
+
+        return new PageImpl<>(contents, pageable, count);
+    }
+
+    private Long getCount(Long groupId, Long userId) {
+        return (long)jpaQueryFactory
                 .selectFrom(interviewQuestion)
-                    .join(interviewQuestion.group, questionGroup).fetchJoin()
-                    .join(interviewQuestion.category, category).fetchJoin()
                 .where(
                     interviewQuestion.group.id.eq(groupId),
                     interviewQuestion.user.id.eq(userId),
                     interviewQuestion.isDeleted.eq(false)
                 )
-                .orderBy(interviewQuestion.id.desc())
-                    .limit(pageable.getPageSize())
-                    .offset(pageable.getOffset())
-                .fetch();
+                .fetch().size();
     }
 
     @Override
