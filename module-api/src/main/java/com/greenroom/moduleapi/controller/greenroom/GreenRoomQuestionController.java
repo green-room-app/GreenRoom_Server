@@ -309,9 +309,6 @@ public class GreenRoomQuestionController {
 
     /**
      * 인기 검색어 목록을 조회할 수 있다
-     */
-    /**
-     * 인기 검색어 목록을 조회할 수 있다
      *
      * GET /api/green-questions/popular-search-words
      */

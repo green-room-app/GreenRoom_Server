@@ -2,7 +2,6 @@ package com.greenroom.moduleapi.security.jwt;
 
 import com.greenroom.modulecommon.exception.ApiException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
