@@ -102,7 +102,7 @@ public class MyQuestionController {
                                                   @Valid @RequestBody UpdateAnswerAndKeywordsRequest request) {
 
         if (!interviewQuestionService.isOwner(id, authentication.getId())) {
-            throw new ApiException(FORBIDDEN, "질문 생성자만 질문을 수정할 수 있습니다");
+            throw new ApiException(FORBIDDEN, "질문 생성자만 답변/키워드를 수정할 수 있습니다");
         }
 
         Long updatedId = interviewQuestionService.updateAnswerAndKeywords(id, request.getAnswer(), request.getKeywords());

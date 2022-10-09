@@ -10,6 +10,7 @@ import com.greenroom.modulecommon.entity.interview.InterviewQuestion;
 import com.greenroom.modulecommon.exception.ApiException;
 import com.greenroom.modulecommon.jwt.JwtAuthentication;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -99,10 +100,10 @@ public class GroupController {
                                                Pageable pageable) {
 
         QuestionGroup group = questionGroupService.getGroup(id);
-        List<InterviewQuestion> questions =
+        Page<InterviewQuestion> questions =
             interviewQuestionService.getInterviewQuestions(id, authentication.getId(), pageable);
 
-        return GetDetailResponse.of(group, questions);
+        return GetDetailResponse.of(group, questions.getContent(), questions.getTotalPages());
     }
 
     /**

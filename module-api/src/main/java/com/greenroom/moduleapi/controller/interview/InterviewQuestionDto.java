@@ -7,6 +7,7 @@ import lombok.Getter;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -22,6 +23,14 @@ public class InterviewQuestionDto {
         @Max(value = 1)
         @NotNull(message = "questionTypeCode 값은 필수입니다.")
         private Integer questionTypeCode;
+    }
+
+    @Getter
+    public static class UpdateQuestionRequest {
+        @NotNull(message = "categoryId 값은 필수입니다.")
+        private Long categoryId;
+        @NotEmpty(message = "question 값은 필수입니다.")
+        private String question;
     }
 
     @Getter

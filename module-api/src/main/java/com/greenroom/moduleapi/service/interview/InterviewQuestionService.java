@@ -1,6 +1,7 @@
 package com.greenroom.moduleapi.service.interview;
 
 import com.greenroom.modulecommon.entity.interview.InterviewQuestion;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -27,12 +28,13 @@ public interface InterviewQuestionService {
     List<InterviewQuestion> getMyQuestions(Long userId, Pageable pageable);
 
     //한 그룹 안에 들어있는 면접 질문 list 조회
-    List<InterviewQuestion> getInterviewQuestions(Long groupId, Long userId, Pageable pageable);
+    Page<InterviewQuestion> getInterviewQuestions(Long groupId, Long userId, Pageable pageable);
 
     InterviewQuestion getInterviewQuestion(Long id);
 
     Long updateQuestion(Long id, Long categoryId, String question);
     /**
+     * B13-1 화면도 연결되어 있음
      * 수정 B15, B15-1, B15-2
      */
     Long updateAnswerAndKeywords(Long id, String answer, List<String> keywordList);

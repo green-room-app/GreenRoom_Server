@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.*;
 
 public class GroupDto {
 
@@ -73,7 +73,10 @@ public class GroupDto {
                     .id(group.getId())
                     .name(group.getName())
                     .categoryId(group.getCategory().getId())
-                    .questionCnt(group.getInterviewQuestions().size())
+                    .questionCnt((int) group.getInterviewQuestions()
+                            .stream()
+                            .filter(question -> !question.isDeleted())
+                            .count())
                     .build();
         }
     }
@@ -85,19 +88,24 @@ public class GroupDto {
         private String name;
         private String categoryName;
         private Integer questionCnt;
+        private Integer totalPages;
         private List<GroupQuestionResponse> groupQuestions;
 
-        public static GetDetailResponse of(QuestionGroup group, List<InterviewQuestion> interviewQuestion) {
+        public static GetDetailResponse of(QuestionGroup group,
+                                           List<InterviewQuestion> interviewQuestion,
+                                           int totalPages) {
+
             return GetDetailResponse.builder()
                     .id(group.getId())
                     .name(group.getName())
                     .categoryName(group.getCategory().getName())
-                    .questionCnt(group.getInterviewQuestions().size())
+                    .questionCnt(interviewQuestion.size())
                     .groupQuestions(
                         interviewQuestion.stream()
                             .map(GroupQuestionResponse::from)
                             .collect(toList())
                     )
+                    .totalPages(totalPages)
                     .build();
         }
     }
@@ -118,7 +126,7 @@ public class GroupDto {
                     .categoryName(interviewQuestion.getCategory().getName())
                     .isRegister(isNotEmpty(interviewQuestion.getKeywords()))
                     .question(interviewQuestion.getQuestion())
-                    .answer(interviewQuestion.getAnswer())
+                    .answer(isEmpty(interviewQuestion.getAnswer()) ? EMPTY : interviewQuestion.getAnswer())
                     .keywords(KeywordUtils.toKeywordList(interviewQuestion.getKeywords()))
                     .build();
         }

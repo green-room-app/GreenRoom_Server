@@ -1,7 +1,6 @@
 package com.greenroom.moduleapi.controller.interview;
 
 import com.greenroom.moduleapi.controller.interview.InterviewQuestionDto.*;
-import com.greenroom.moduleapi.controller.myquestion.MyQuestionDto;
 import com.greenroom.moduleapi.service.interview.InterviewQuestionService;
 import com.greenroom.moduleapi.service.interview.query.InterviewQuestionQueryService;
 import com.greenroom.modulecommon.entity.interview.QuestionType;
@@ -44,17 +43,37 @@ public class InterviewQuestionController {
     }
 
     /**
-     * 사용자는 면접 연습용 질문에 대한 답변/키워드를 등록/수정할 수 있다
+     * 사용자는 면접 연습용 질문을 수정할 수 있다
      *
-     * PUT /api/interview-questions/{id}
+     * PUT /api/interview-questions/:id
      */
     @PutMapping("/{id}")
-    public UpdateResponse updateInterviewQuestions(@PathVariable("id") Long id,
-                                                   @AuthenticationPrincipal JwtAuthentication authentication,
-                                                   @Valid @RequestBody UpdateAnswerAndKeywordsRequest request) {
+    public UpdateResponse updateInterviewQuestion(@PathVariable("id") Long id,
+                                                  @AuthenticationPrincipal JwtAuthentication authentication,
+                                                  @Valid @RequestBody UpdateQuestionRequest request) {
 
         if (!questionService.isOwner(id, authentication.getId())) {
             throw new ApiException(FORBIDDEN, "질문 생성자만 질문을 수정할 수 있습니다");
+        }
+
+        Long updatedId = questionService.updateQuestion(id, request.getCategoryId(), request.getQuestion());
+
+        return UpdateResponse.from(updatedId);
+    }
+
+    /**
+     * 사용자는 면접 연습용 질문에 대한 답변/키워드를 등록/수정할 수 있다
+     *
+     * PUT /api/interview-questions/answer/{id}
+     */
+    @PutMapping("/answer/{id}")
+    public UpdateResponse updateInterviewQuestionAnswerAndKeywords(
+                                                            @PathVariable("id") Long id,
+                                                            @AuthenticationPrincipal JwtAuthentication authentication,
+                                                            @Valid @RequestBody UpdateAnswerAndKeywordsRequest request) {
+
+        if (!questionService.isOwner(id, authentication.getId())) {
+            throw new ApiException(FORBIDDEN, "질문 생성자만 답변/키워드를 수정할 수 있습니다");
         }
 
         Long updatedId = questionService.updateAnswerAndKeywords(id, request.getAnswer(), request.getKeywords());
