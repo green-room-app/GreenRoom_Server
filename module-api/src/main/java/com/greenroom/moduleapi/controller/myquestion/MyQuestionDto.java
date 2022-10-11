@@ -70,6 +70,7 @@ public class MyQuestionDto {
     @Builder
     public static class GetDetailResponse {
         private Long id;
+        private String groupName;
         private String groupCategoryName;
         private String categoryName;
         private String question;
@@ -79,6 +80,11 @@ public class MyQuestionDto {
         public static GetDetailResponse from(InterviewQuestion interviewQuestion) {
             return GetDetailResponse.builder()
                     .id(interviewQuestion.getId())
+                    .groupName(
+                            interviewQuestion.getGroup()
+                                    .map(QuestionGroup::getName)
+                                    .orElse(EMPTY)
+                    )
                     .groupCategoryName(
                         interviewQuestion.getGroup()
                             .map(group -> group.getCategory().getName())

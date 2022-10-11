@@ -1,5 +1,6 @@
 package com.greenroom.moduleapi.controller.interview;
 
+import com.greenroom.modulecommon.entity.group.QuestionGroup;
 import com.greenroom.modulecommon.entity.interview.InterviewQuestion;
 import com.greenroom.modulecommon.repository.interview.query.InterviewQuestionQueryDto;
 import lombok.AllArgsConstructor;
@@ -82,6 +83,7 @@ public class InterviewQuestionDto {
     @Builder
     public static class GetDetailResponse {
         private Long id;
+        private String groupName;
         private String groupCategoryName;
         private String categoryName;
         private String question;
@@ -91,6 +93,11 @@ public class InterviewQuestionDto {
         public static GetDetailResponse from(InterviewQuestion interviewQuestion) {
             return GetDetailResponse.builder()
                     .id(interviewQuestion.getId())
+                    .groupName(
+                            interviewQuestion.getGroup()
+                                    .map(QuestionGroup::getName)
+                                    .orElse(EMPTY)
+                    )
                     .groupCategoryName(
                             interviewQuestion.getGroup()
                                     .map(group -> group.getCategory().getName())
