@@ -3,6 +3,7 @@ package com.greenroom.moduleapi.controller.interview;
 import com.greenroom.moduleapi.controller.interview.InterviewQuestionDto.*;
 import com.greenroom.moduleapi.service.interview.InterviewQuestionService;
 import com.greenroom.moduleapi.service.interview.query.InterviewQuestionQueryService;
+import com.greenroom.modulecommon.entity.interview.InterviewQuestion;
 import com.greenroom.modulecommon.entity.interview.QuestionType;
 import com.greenroom.modulecommon.exception.ApiException;
 import com.greenroom.modulecommon.jwt.JwtAuthentication;
@@ -40,6 +41,25 @@ public class InterviewQuestionController {
                 .stream()
                 .map(InterviewQuestionDto.GetResponse::from)
                 .collect(toList());
+    }
+
+    /**
+     * 사용자는 면접 연습용 질문 1건을 조회할 수 있다
+     * GET /api/interview-questions/:id
+     */
+    @GetMapping("/{id}")
+    public GetDetailResponse getMyQuestion(@PathVariable("id") Long id) {
+
+        InterviewQuestion interviewQuestion = questionService.getInterviewQuestion(id);
+
+        switch (interviewQuestion.getQuestionType()) {
+            case BASIC_QUESTION_WITH_GROUP:
+            case MY_QUESTION_WITH_GROUP:
+            case GREENROOM_QUESTION:
+                return GetDetailResponse.from(interviewQuestion);
+            default:
+                throw new IllegalArgumentException("해당 질문은 면접 연습용 질문이 아닙니다.");
+        }
     }
 
     /**

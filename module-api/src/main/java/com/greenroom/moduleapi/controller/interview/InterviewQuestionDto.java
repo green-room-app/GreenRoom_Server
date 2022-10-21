@@ -1,5 +1,7 @@
 package com.greenroom.moduleapi.controller.interview;
 
+import com.greenroom.modulecommon.entity.group.QuestionGroup;
+import com.greenroom.modulecommon.entity.interview.InterviewQuestion;
 import com.greenroom.modulecommon.repository.interview.query.InterviewQuestionQueryDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +12,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 public class InterviewQuestionDto {
 
@@ -68,6 +72,41 @@ public class InterviewQuestionDto {
                     .questionTypeCode(questionQueryDto.getQuestionType().getCode())
                     .questionType(questionQueryDto.getQuestionType().getValue())
                     .question(questionQueryDto.getQuestion())
+                    .build();
+        }
+    }
+
+    /**
+     * B11 상세 조회 결과 DTO
+     */
+    @Getter
+    @Builder
+    public static class GetDetailResponse {
+        private Long id;
+        private String groupName;
+        private String groupCategoryName;
+        private String categoryName;
+        private String question;
+        private String answer;
+        private List<String> keywords;
+
+        public static GetDetailResponse from(InterviewQuestion interviewQuestion) {
+            return GetDetailResponse.builder()
+                    .id(interviewQuestion.getId())
+                    .groupName(
+                            interviewQuestion.getGroup()
+                                    .map(QuestionGroup::getName)
+                                    .orElse(EMPTY)
+                    )
+                    .groupCategoryName(
+                            interviewQuestion.getGroup()
+                                    .map(group -> group.getCategory().getName())
+                                    .orElse(EMPTY)
+                    )
+                    .categoryName(interviewQuestion.getCategory().getName())
+                    .question(interviewQuestion.getQuestion())
+                    .answer(interviewQuestion.getAnswer())
+                    .keywords(interviewQuestion.toKeywordList())
                     .build();
         }
     }
