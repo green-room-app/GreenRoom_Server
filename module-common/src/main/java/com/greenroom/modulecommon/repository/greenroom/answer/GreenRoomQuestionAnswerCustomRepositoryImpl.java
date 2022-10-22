@@ -30,8 +30,8 @@ public class GreenRoomQuestionAnswerCustomRepositoryImpl implements GreenRoomQue
                     categoriesEq(categoryIds)
                 )
                 .orderBy(greenRoomQuestionAnswer.id.desc())
-                    .limit(pageable.getPageSize())
                     .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize())
                 .fetch();
     }
 
@@ -39,14 +39,14 @@ public class GreenRoomQuestionAnswerCustomRepositoryImpl implements GreenRoomQue
     public List<GreenRoomQuestionAnswer> findAll(Long questionId, Long userId, Pageable pageable) {
         return jpaQueryFactory
                 .selectFrom(greenRoomQuestionAnswer)
-                .leftJoin(greenRoomQuestionAnswer.user, user).fetchJoin()
-                .join(greenRoomQuestionAnswer.greenRoomQuestion, greenRoomQuestion).fetchJoin()
+                    .leftJoin(greenRoomQuestionAnswer.user, user).fetchJoin()
+                    .join(greenRoomQuestionAnswer.greenRoomQuestion, greenRoomQuestion).fetchJoin()
                 .where(
                     greenRoomQuestionAnswer.greenRoomQuestion.id.eq(questionId)
                 )
-                .orderBy(greenRoomQuestionAnswer.user.id.subtract(userId).abs().asc().nullsLast())
-                    .limit(pageable.getPageSize())
+                .orderBy(greenRoomQuestionAnswer.user.id.subtract(userId).abs().asc())
                     .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize())
                 .fetch();
     }
 
