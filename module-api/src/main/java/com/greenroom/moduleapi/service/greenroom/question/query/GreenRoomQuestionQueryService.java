@@ -1,9 +1,11 @@
 package com.greenroom.moduleapi.service.greenroom.question.query;
 
+import com.google.common.eventbus.EventBus;
 import com.greenroom.moduleapi.service.greenroom.answer.GreenRoomQuestionAnswerService;
 import com.greenroom.moduleapi.service.greenroom.question.GreenRoomQuestionService;
 import com.greenroom.moduleapi.service.greenroom.scrap.GreenRoomQuestionScrapService;
 import com.greenroom.modulecommon.entity.greenroom.GreenRoomQuestion;
+import com.greenroom.modulecommon.event.SearchEvent;
 import com.greenroom.modulecommon.repository.greenroom.question.query.GreenRoomQuestionQueryDto;
 import com.greenroom.modulecommon.repository.greenroom.question.query.GreenRoomQuestionQueryRepository;
 import com.greenroom.modulecommon.repository.greenroom.question.query.PopularQuestionQueryDto;
@@ -17,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -27,6 +30,17 @@ public class GreenRoomQuestionQueryService {
     private final GreenRoomQuestionService questionService;
     private final GreenRoomQuestionAnswerService answerService;
     private final GreenRoomQuestionScrapService scrapService;
+    private final EventBus eventBus;
+
+    public List<GreenRoomQuestionQueryDto> findAll(Long userId, String searchWord, Pageable pageable) {
+        checkArgument(userId != null, "userId 값은 필수입니다.");
+
+        if (isNotBlank(searchWord)) {
+            eventBus.post(SearchEvent.from(searchWord));
+        }
+
+        return repository.findAll(userId, searchWord, pageable);
+    }
 
     public List<GreenRoomQuestionQueryDto> findAll(Long userId, Long categoryId, Pageable pageable) {
         checkArgument(userId != null, "userId 값은 필수입니다.");

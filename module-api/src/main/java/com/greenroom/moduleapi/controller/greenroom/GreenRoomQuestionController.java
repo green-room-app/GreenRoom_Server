@@ -65,6 +65,24 @@ public class GreenRoomQuestionController {
     }
 
     /**
+     * 사용자는 검색어를 사용해서 그린룸질문 목록을 조회할 수 있다 (B3, B3-1 화면)
+     *
+     * GET /api/green-questions/search
+     */
+    @GetMapping("/search")
+    public List<GetCategoryQuestionResponse> getGreenRoomQuestions(@AuthenticationPrincipal JwtAuthentication authentication,
+                                                                   @RequestParam(value = "title", required = false) String searchWord,
+                                                                   Pageable pageable) {
+
+        return questionQueryService.findAll(authentication.getId(), searchWord, pageable)
+                .stream().map(dto -> {
+                    String profileUrl = isEmpty(dto.getProfileUrl()) ? EMPTY : dto.getProfileUrl();
+                    String presignedUrl = isEmpty(profileUrl) ? profileUrl : presignerUtils.getPresignedGetUrl(profileUrl);
+                    return GetCategoryQuestionResponse.of(dto, presignedUrl);
+                }).collect(toList());
+    }
+
+    /**
      * 사용자는 그린룸질문의 상세 정보를 조회할 수 있다
      *
      * GET /api/green-questions/:id
