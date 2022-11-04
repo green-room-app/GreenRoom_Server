@@ -13,6 +13,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 public class InterviewQuestionDto {
@@ -59,19 +60,22 @@ public class InterviewQuestionDto {
     @Getter
     @Builder
     public static class GetResponse {
-        private Long id;
-        private String categoryName;
-        private Integer questionTypeCode;
-        private String questionType;
-        private String question;
+        private Integer currentPages;
+        private Integer totalPages;
+        private List<InterviewQuestionResponse> questions;
 
-        public static GetResponse from(InterviewQuestionQueryDto questionQueryDto) {
+        public static GetResponse of(List<InterviewQuestionQueryDto> interviewQuestion,
+                                     int currentPages,
+                                     int totalPages) {
+
             return GetResponse.builder()
-                    .id(questionQueryDto.getId())
-                    .categoryName(questionQueryDto.getCategoryName())
-                    .questionTypeCode(questionQueryDto.getQuestionType().getCode())
-                    .questionType(questionQueryDto.getQuestionType().getValue())
-                    .question(questionQueryDto.getQuestion())
+                    .currentPages(currentPages)
+                    .totalPages(totalPages)
+                    .questions(
+                        interviewQuestion.stream()
+                            .map(InterviewQuestionResponse::from)
+                            .collect(toList())
+                    )
                     .build();
         }
     }
@@ -118,6 +122,26 @@ public class InterviewQuestionDto {
 
         public static UpdateResponse from(Long id) {
             return new UpdateResponse(id);
+        }
+    }
+
+    @Getter
+    @Builder
+    public static class InterviewQuestionResponse {
+        private Long id;
+        private String categoryName;
+        private Integer questionTypeCode;
+        private String questionType;
+        private String question;
+
+        public static InterviewQuestionResponse from(InterviewQuestionQueryDto questionQueryDto) {
+            return InterviewQuestionResponse.builder()
+                    .id(questionQueryDto.getId())
+                    .categoryName(questionQueryDto.getCategoryName())
+                    .questionTypeCode(questionQueryDto.getQuestionType().getCode())
+                    .questionType(questionQueryDto.getQuestionType().getValue())
+                    .question(questionQueryDto.getQuestion())
+                    .build();
         }
     }
 }
