@@ -7,17 +7,17 @@ import com.greenroom.modulecommon.entity.interview.InterviewQuestion;
 import com.greenroom.modulecommon.entity.interview.QuestionType;
 import com.greenroom.modulecommon.exception.ApiException;
 import com.greenroom.modulecommon.jwt.JwtAuthentication;
+import com.greenroom.modulecommon.repository.interview.query.InterviewQuestionQueryDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 import static com.greenroom.modulecommon.entity.interview.QuestionType.BASIC_QUESTION;
 import static com.greenroom.modulecommon.exception.EnumApiException.FORBIDDEN;
-import static java.util.stream.Collectors.toList;
 
 @RequestMapping("/api/interview-questions")
 @RequiredArgsConstructor
@@ -33,14 +33,14 @@ public class InterviewQuestionController {
      * GET /api/interview-questions
      */
     @GetMapping
-    public List<GetResponse> getInterviewQuestions(@AuthenticationPrincipal JwtAuthentication authentication,
+    public GetResponse getInterviewQuestions(@AuthenticationPrincipal JwtAuthentication authentication,
                                                    InterviewQuestionSearchOption searchOption,
                                                    Pageable pageable) {
 
-        return questionQueryService.findAll(searchOption, authentication.getId(), pageable)
-                .stream()
-                .map(InterviewQuestionDto.GetResponse::from)
-                .collect(toList());
+        Page<InterviewQuestionQueryDto> questions =
+            questionQueryService.findAll(searchOption, authentication.getId(), pageable);
+
+        return GetResponse.of(questions.getContent(), pageable.getPageNumber(), questions.getTotalPages());
     }
 
     /**

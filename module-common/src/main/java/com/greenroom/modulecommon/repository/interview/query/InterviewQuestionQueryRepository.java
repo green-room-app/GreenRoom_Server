@@ -4,6 +4,8 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -29,32 +31,52 @@ public class InterviewQuestionQueryRepository {
      * private QuestionType questionType;
      * private String question;
      */
-    public List<InterviewQuestionQueryDto> findAll(Long userId,
+    public Page<InterviewQuestionQueryDto> findAll(Long userId,
                                                    List<Long> categories,
                                                    String title,
                                                    Pageable pageable) {
 
-        return jpaQueryFactory
+        List<InterviewQuestionQueryDto> contents = jpaQueryFactory
                 .select(
                         Projections.constructor(
-                                InterviewQuestionQueryDto.class,
-                                interviewQuestion.id,
-                                interviewQuestion.category.id,
-                                interviewQuestion.category.name,
-                                interviewQuestion.questionType,
-                                interviewQuestion.question
+                            InterviewQuestionQueryDto.class,
+                            interviewQuestion.id,
+                            interviewQuestion.category.id,
+                            interviewQuestion.category.name,
+                            interviewQuestion.questionType,
+                            interviewQuestion.question
                         )
-                ).from(interviewQuestion)
+                )
+                .from(interviewQuestion)
+                .where(
+                    categoriesEq(categories),
+                    titleContains(title),
+                    isInterviewQuestion(userId),
+                    interviewQuestion.isDeleted.eq(false)
+                )
+                .orderBy(interviewQuestion.id.desc())
+                    .limit(pageable.getPageSize())
+                    .offset(pageable.getOffset())
+                .fetch();
+
+        Long count = getCount(userId, categories, title);
+
+        return new PageImpl<>(contents, pageable, count);
+    }
+
+    private Long getCount(Long userId,
+                          List<Long> categories,
+                          String title) {
+
+        return (long)jpaQueryFactory
+                .selectFrom(interviewQuestion)
                 .where(
                         categoriesEq(categories),
                         titleContains(title),
                         isInterviewQuestion(userId),
                         interviewQuestion.isDeleted.eq(false)
                 )
-                .orderBy(interviewQuestion.id.desc())
-                    .limit(pageable.getPageSize())
-                    .offset(pageable.getOffset())
-                .fetch();
+                .fetch().size();
     }
 
     private BooleanExpression categoriesEq(List<Long> categories) {

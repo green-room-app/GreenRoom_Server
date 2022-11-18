@@ -4,11 +4,10 @@ import com.greenroom.modulecommon.repository.interview.query.InterviewQuestionQu
 import com.greenroom.modulecommon.repository.interview.query.InterviewQuestionQueryRepository;
 import com.greenroom.moduleapi.controller.interview.InterviewQuestionSearchOption;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -19,7 +18,7 @@ public class InterviewQuestionQueryService {
 
     private final InterviewQuestionQueryRepository questionQueryRepository;
 
-    public List<InterviewQuestionQueryDto> findAll(InterviewQuestionSearchOption searchOption,
+    public Page<InterviewQuestionQueryDto> findAll(InterviewQuestionSearchOption searchOption,
                                                    Long userId,
                                                    Pageable pageable) {
 
