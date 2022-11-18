@@ -208,9 +208,9 @@ public class GreenRoomQuestionController {
     }
 
     /**
-     * 사용자는 그린룸질문에 대한 답변을 생성할 수 있다
+     * 사용자는 그린룸질문을 스크랩할 수 있다.
      *
-     * POST /api/green-questions/answer
+     * POST /api/green-questions/scrap
      */
     @PostMapping("/scrap")
     public CreateResponse createScrap(@AuthenticationPrincipal JwtAuthentication authentication,

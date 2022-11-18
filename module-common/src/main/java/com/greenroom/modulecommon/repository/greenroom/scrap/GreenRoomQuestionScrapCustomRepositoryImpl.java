@@ -40,9 +40,7 @@ public class GreenRoomQuestionScrapCustomRepositoryImpl implements GreenRoomQues
                 .selectFrom(greenRoomQuestionScrap)
                     .leftJoin(greenRoomQuestionScrap.user, user).fetchJoin()
                     .join(greenRoomQuestionScrap.greenRoomQuestion, greenRoomQuestion).fetchJoin()
-                .where(
-                    greenRoomQuestionScrap.id.eq(id),
-                    greenRoomQuestionScrap.isDeleted.eq(false))
+                .where(greenRoomQuestionScrap.id.eq(id))
                 .fetchFirst();
 
         return Optional.ofNullable(result);
@@ -56,8 +54,7 @@ public class GreenRoomQuestionScrapCustomRepositoryImpl implements GreenRoomQues
                     .join(greenRoomQuestionScrap.greenRoomQuestion, greenRoomQuestion).fetchJoin()
                 .where(
                     greenRoomQuestionScrap.greenRoomQuestion.id.eq(questionId),
-                    greenRoomQuestionScrap.user.id.eq(userId),
-                    greenRoomQuestionScrap.isDeleted.eq(false)
+                    greenRoomQuestionScrap.user.id.eq(userId)
                 )
                 .fetchFirst();
 
