@@ -5,6 +5,7 @@ import com.greenroom.moduleapi.service.greenroom.answer.GreenRoomQuestionAnswerS
 import com.greenroom.moduleapi.service.greenroom.question.GreenRoomQuestionService;
 import com.greenroom.moduleapi.service.greenroom.scrap.GreenRoomQuestionScrapService;
 import com.greenroom.modulecommon.entity.greenroom.GreenRoomQuestion;
+import com.greenroom.modulecommon.entity.greenroom.GreenRoomQuestionScrap;
 import com.greenroom.modulecommon.event.SearchEvent;
 import com.greenroom.modulecommon.repository.greenroom.question.query.GreenRoomQuestionQueryDto;
 import com.greenroom.modulecommon.repository.greenroom.question.query.GreenRoomQuestionQueryRepository;
@@ -64,6 +65,14 @@ public class GreenRoomQuestionQueryService {
         checkArgument(userId != null, "userId 값은 필수입니다.");
 
         boolean isScrap = scrapService.exist(questionId, userId);
+
+        GreenRoomQuestionScrap scrap = null;
+
+        if (isScrap) {
+            scrap = scrapService.getScrap(questionId, userId);
+            isScrap = !scrap.isDeleted();
+        }
+
         boolean isParticipated = answerService.isParticipated(questionId, userId);
         GreenRoomQuestion greenRoomQuestion = questionService.getGreenRoomQuestion(questionId);
 
@@ -76,6 +85,7 @@ public class GreenRoomQuestionQueryService {
         return GreenRoomQuestionDetailDto.builder()
                                         .id(greenRoomQuestion.getId())
                                         .isScrap(isScrap)
+                                        .scrapId(isScrap ? scrap.getId() : null)
                                         .isParticipated(isParticipated)
                                         .isWriter(isWriter)
                                         .isExpired(isExpired)

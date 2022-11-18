@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class GreenRoomQuestionDetailDto {
     private Long id;    //그린룸 질문 id
     private boolean isScrap;
+    private Long scrapId;
     private boolean isParticipated;
     private boolean isWriter;
     private boolean isExpired;

@@ -238,6 +238,7 @@ public class GreenRoomQuestionDto {
     public static class GetQuestionDetailResponse {
         private Long id;    //그린룸 질문 id
         private boolean isScrap;
+        private Long scrapId;
         private boolean isParticipated;
         private boolean isWriter;
         private boolean isExpired;
@@ -250,6 +251,7 @@ public class GreenRoomQuestionDto {
             return GetQuestionDetailResponse.builder()
                     .id(dto.getId())
                     .isScrap(dto.isScrap())
+                    .scrapId(dto.getScrapId())
                     .isParticipated(dto.isParticipated())
                     .isWriter(dto.isWriter())
                     .isExpired(dto.isExpired())
