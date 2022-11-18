@@ -87,19 +87,20 @@ public class GroupDto {
         private Long id;
         private String name;
         private String categoryName;
-        private Integer questionCnt;
+        private Long questionCnt;
         private Integer totalPages;
         private List<GroupQuestionResponse> groupQuestions;
 
         public static GetDetailResponse of(QuestionGroup group,
                                            List<InterviewQuestion> interviewQuestion,
+                                           long totalQuestionSize,
                                            int totalPages) {
 
             return GetDetailResponse.builder()
                     .id(group.getId())
                     .name(group.getName())
                     .categoryName(group.getCategory().getName())
-                    .questionCnt(interviewQuestion.size())
+                    .questionCnt(totalQuestionSize)
                     .groupQuestions(
                         interviewQuestion.stream()
                             .map(GroupQuestionResponse::from)

@@ -103,7 +103,7 @@ public class GroupController {
         Page<InterviewQuestion> questions =
             interviewQuestionService.getInterviewQuestions(id, authentication.getId(), pageable);
 
-        return GetDetailResponse.of(group, questions.getContent(), questions.getTotalPages());
+        return GetDetailResponse.of(group, questions.getContent(), questions.getTotalElements(), questions.getTotalPages());
     }
 
     /**
